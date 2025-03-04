@@ -23,6 +23,10 @@ const Event = sequelize.define('Event', {
         type: DataTypes.DATE,
         allowNull: false,
     },
+    category: {
+        type: DataTypes.ENUM('Кино', 'Театр', 'Выставка', 'Конференция'),
+        allowNull: true,
+    },
     createdBy: {
         type: DataTypes.INTEGER,
         allowNull: false,
