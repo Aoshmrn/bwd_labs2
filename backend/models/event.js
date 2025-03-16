@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
+const User = require('./user');
 
 const Event = sequelize.define('Event', {
     id: {
@@ -32,5 +33,7 @@ const Event = sequelize.define('Event', {
         allowNull: false,
     },
 });
+
+Event.belongsTo(User, { foreignKey: 'createdBy' });
 
 module.exports = Event;

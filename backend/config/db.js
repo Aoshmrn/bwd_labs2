@@ -1,7 +1,5 @@
-const {Sequelize} = require('sequelize');
-const dotenv = require('dotenv');
-
-dotenv.config();
+const { Sequelize } = require('sequelize');
+require('dotenv').config({ path: '../.env' });
 
 const sequelize = new Sequelize(
     process.env.DB_NAME,
@@ -13,14 +11,5 @@ const sequelize = new Sequelize(
         dialect: 'postgres',
     }
 );
-
-async function authenticate() {
-    try {
-        await sequelize.authenticate();
-        console.log('Соединение с БД установленно');
-    } catch(eror){
-        console.error('Ошибка подключения к БД:', eror);
-    }
-};
 
 module.exports = sequelize;
