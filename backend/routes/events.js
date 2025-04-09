@@ -1,19 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const { getEventById, createEvent, deleteEvent, getAllEvents, updateEvent } = require("../controllers/event.controller")
+const { checkOwnership } = require('../controllers/user.controller');
+const Event = require('../models/event');
+const { getEventById, createEvent, deleteEvent, getAllEvents, updateEvent } = require("../controllers/event.controller");
 
 router.use(passport.authenticate('jwt', { session: false }));
 
+router.use((req, res, next) => {
+    req.model = Event;
+    next();
+});
+
 router.get('/', getAllEvents);
-
 router.get('/:id', getEventById);
-
 router.post('/', createEvent);
-
-router.put('/:id', updateEvent);
-
-router.delete('/:id', deleteEvent);
+router.put('/:id', checkOwnership, updateEvent);
+router.delete('/:id', checkOwnership, deleteEvent);
 
 module.exports = router;
 

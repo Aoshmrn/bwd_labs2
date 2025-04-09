@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const { createUser, getAllUser } = require("../controllers/user.controller");
+const { createUser, getAllUser, updateUserRole, checkRole } = require("../controllers/user.controller");
 
 router.use(passport.authenticate('jwt', { session: false }));
-
-router.post('/', createUser);
+router.use(checkRole);
 
 router.get('/', getAllUser);
+router.post('/', createUser);
+router.patch('/:id/role', updateUserRole);
 
 module.exports = router;
 

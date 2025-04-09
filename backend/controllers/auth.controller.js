@@ -16,12 +16,15 @@ async function registerUser(req, res, next) {
             throw new ValidationError(['Email уже используется']);
         }
 
+        const userCount = await User.count();
+        
         const hashedPassword = await bcrypt.hash(password, 10);
-
         const user = await User.create({ 
             email, 
             name, 
-            password: hashedPassword 
+            password: hashedPassword,
+            // Если это первый пользователь, назначаем его администратором
+            role: (userCount === 0) ? 'admin' : 'user'
         });
 
         res.status(201).json({ 
@@ -30,6 +33,7 @@ async function registerUser(req, res, next) {
                 id: user.id,
                 name: user.name,
                 email: user.email,
+                role: user.role,
                 createdAt: user.createdAt
             }
         });
