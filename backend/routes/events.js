@@ -1,107 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const { Event, User } = require('../models');
-const { ValidationError, NotFoundError } = require('../customErrors');
+const passport = require('passport');
+const { checkOwnership } = require('../controllers/user.controller');
+const Event = require('../models/event');
+const { getEventById, createEvent, deleteEvent, getAllEvents, updateEvent } = require("../controllers/event.controller");
 
-// Список мероприятий с фильтрацией по категории
-router.get('/', async (req, res, next) => {
-    try {
-        const { category } = req.query;
-        const whereClsuse = category ? {category} : {};
-        
+router.use(passport.authenticate('jwt', { session: false }));
 
-        const events = await Event.findAll({
-            where: whereClsuse,
-            include: [{model: User, attributes: ['name', 'email']}],
-        });
-
-        res.status(200).json(events);
-    } catch (error) {
-        next(error);
-    }
+router.use((req, res, next) => {
+    req.model = Event;
+    next();
 });
 
-// Получение списка всех мероприятий
-router.get('/', async (req, res, next) => {
-    try {
-        const events = await Event.findAll({
-            include: [{ model: User, attributes: ['name', 'email'] }],
-        });
-
-        res.status(200).json(events);
-    } catch (error) {
-        next(error);
-    }
-});
-
-// Получение одного мероприятия по ID
-router.get('/:id', async (req, res, next) => {
-    try {
-        const event = await Event.findByPk(req.params.id, {
-            include: [{ model: User, attributes: ['name', 'email'] }],
-        });
-        if (!event) {
-            throw new NotFoundError('Мероприятие');
-        }
-        res.status(200).json(event);
-    } catch (error) {
-        next(error);
-    }
-});
-
-// Создание мероприятия
-router.post('/', async (req, res, next) => {
-    try {
-        const { title, description, date, category, createdBy } = req.body;
-        const errors = [];
-
-        if (!title) errors.push('Поле title обязательно');
-        if (!date) errors.push('Поле date обязательно');
-        if (!createdBy) errors.push('Поле createdBy обязательно');
-        
-        if (errors.length > 0) {
-            throw new ValidationError(errors);
-        }
-        
-        const event = await Event.create({ title, description, date, category, createdBy });
-        res.status(201).json(event);
-    } catch (error) {
-        next(error);
-    }
-});
-
-// Обновление мероприятия
-router.put('/:id', async (req, res, next) => {
-    try {
-        const { title, description, date, category} = req.body;
-        const event = await Event.findByPk(req.params.id);
-        if (!event) {
-            throw new NotFoundError('Мероприятие');
-        }
-        event.title = title || event.title;
-        event.description = description || event.description;
-        event.date = date || event.date;
-        event.category = category || event.category;
-        await event.save();
-        res.status(200).json(event);
-    } catch (error) {
-        next(error);
-    }
-});
-
-// Удаление мероприятия
-router.delete('/:id', async (req, res, next) => {
-    try {
-        const event = await Event.findByPk(req.params.id);
-        if (!event) {
-            throw new NotFoundError('Мероприятие');
-        }
-        await event.destroy();
-        res.status(200).json({ message: 'Мероприятие удалено' });
-    } catch (error) {
-        next(error);
-    }
-});
+router.get('/', getAllEvents);
+router.get('/:id', getEventById);
+router.post('/', createEvent);
+router.put('/:id', checkOwnership, updateEvent);
+router.delete('/:id', checkOwnership, deleteEvent);
 
 module.exports = router;
 

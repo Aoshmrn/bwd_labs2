@@ -1,40 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { User } = require('../models');
-const { ValidationError, NotFoundError } = require('../customErrors');
+const passport = require('passport');
+const { createUser, getAllUser, updateUserRole, checkRole } = require("../controllers/user.controller");
 
-router.post('/', async (req, res, next) => {
-try {
-    const { name, email } = req.body;
-    const errors = [];
-    
-    if (!name) errors.push('Поле name обязательно');
-    if (!email) errors.push('Поле email обязательно');
-    
-    if (errors.length > 0) {
-    throw new ValidationError(errors);
-    }
+router.use(passport.authenticate('jwt', { session: false }));
+router.use(checkRole);
 
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-    throw new ValidationError(['Пользователь с таким email уже существует']);
-    }
-
-    const user = await User.create({ name, email });
-    res.status(201).json(user);
-} catch (error) {
-    next(error);
-}
-});
-
-router.get('/', async (req, res, next) => {
-try {
-    const users = await User.findAll();
-    res.status(200).json(users);
-} catch (error) {
-    next(error);
-}
-});
+router.get('/', getAllUser);
+router.post('/', createUser);
+router.patch('/:id/role', updateUserRole);
 
 module.exports = router;
 
