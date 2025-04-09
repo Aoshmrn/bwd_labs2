@@ -25,7 +25,7 @@ const Event = sequelize.define('Event', {
         allowNull: false,
     },
     category: {
-        type: DataTypes.ENUM('Кино', 'Театр', 'Выставка', 'Конференция'),
+        type: DataTypes.ENUM('концерт', 'лекция', 'выставка'),
         allowNull: true,
     },
     createdBy: {

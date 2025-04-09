@@ -1,25 +1,16 @@
 const User = require('../models/user');
-const { NotFoundError, ValidationError } = require('../customErrors');
+const { ValidationError } = require('../customErrors');
 
 async function createUser(req, res, next) {
     try {
-        const { name, email } = req.body;
-        const errors = [];
-        
-        if (!name) errors.push('Поле name обязательно');
-        if (!email) errors.push('Поле email обязательно');
-        
-        if (errors.length > 0) {
-        throw new ValidationError(errors);
+        const { name, email, password } = req.body;
+
+        if (!name || !email || !password) {
+            throw new ValidationError(['Заполните все поля']);
         }
-    
-        const existingUser = await User.findOne({ where: { email } });
-        if (existingUser) {
-        throw new ValidationError(['Пользователь с таким email уже существует']);
-        }
-    
-        const user = await User.create({ name, email });
-        res.status(201).json(user);
+
+        const user = await User.create({ name, email, password });
+        res.status(201).json({ message: 'Пользователь создан', user });
     } catch (error) {
         next(error);
     }
