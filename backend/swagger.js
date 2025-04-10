@@ -9,7 +9,7 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'Документация для API мероприятий и пользователей',
       contact: {
-        name: 'Shangin Arsrny',
+        name: 'Shangin Arseny',
         email: 'mail@example.com',
       },
     },
@@ -27,6 +27,37 @@ const swaggerOptions = {
           bearerFormat: 'JWT',
         },
       },
+      schemas: {
+        Error: {
+          type: 'object',
+          properties: {
+            message: {
+              type: 'string',
+              description: 'Сообщение об ошибке'
+            },
+            errors: {
+              type: 'array',
+              items: {
+                type: 'string'
+              },
+              description: 'Список ошибок'
+            }
+          }
+        },
+        AuthResponse: {
+          type: 'object',
+          properties: {
+            message: {
+              type: 'string',
+              description: 'Сообщение о статусе'
+            },
+            token: {
+              type: 'string',
+              description: 'JWT токен'
+            }
+          }
+        }
+      }
     },
     security: [
       {

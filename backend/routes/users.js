@@ -65,6 +65,41 @@ module.exports = router;
 
 /**
  * @swagger
+ * /users/{id}/role:
+ *   patch:
+ *     summary: Изменить роль пользователя (только для админов)
+ *     tags: [Пользователи]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - role
+ *             properties:
+ *               role:
+ *                 type: string
+ *                 enum: [user, admin]
+ *     responses:
+ *       200:
+ *         description: Роль успешно обновлена
+ *       403:
+ *         description: Недостаточно прав
+ *       404:
+ *         description: Пользователь не найден
+ */
+
+/**
+ * @swagger
  * components:
  *   schemas:
  *     User:
