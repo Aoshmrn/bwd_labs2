@@ -20,13 +20,6 @@ const swaggerOptions = {
       },
     ],
     components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-        },
-      },
       schemas: {
         Error: {
           type: 'object',
@@ -44,6 +37,28 @@ const swaggerOptions = {
             }
           }
         },
+        User: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'integer'
+            },
+            name: {
+              type: 'string'
+            },
+            email: {
+              type: 'string'
+            },
+            role: {
+              type: 'string',
+              enum: ['user', 'admin']
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time'
+            }
+          }
+        },
         AuthResponse: {
           type: 'object',
           properties: {
@@ -56,16 +71,53 @@ const swaggerOptions = {
               description: 'JWT токен'
             }
           }
+        },
+        UserInput: {
+          type: 'object',
+          required: ['name', 'email', 'password'],
+          properties: {
+            name: {
+              type: 'string'
+            },
+            email: {
+              type: 'string',
+              format: 'email'
+            },
+            password: {
+              type: 'string',
+              format: 'password'
+            }
+          }
+        },
+        Event: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'integer'
+            },
+            title: {
+              type: 'string'
+            },
+            description: {
+              type: 'string'
+            },
+            date: {
+              type: 'string',
+              format: 'date-time'
+            },
+            category: {
+              type: 'string',
+              enum: ['концерт', 'лекция', 'выставка']
+            },
+            createdBy: {
+              type: 'integer'
+            }
+          }
         }
       }
-    },
-    security: [
-      {
-        bearerAuth: [],
-      },
-    ],
+    }
   },
-  apis: ['backend/routes/*.js'],
+  apis: ['./routes/*.js'],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);

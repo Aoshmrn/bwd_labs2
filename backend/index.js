@@ -20,6 +20,7 @@ app.use(passport.initialize());
 const docs = express();
 docs.use(express.json());
 docs.use(cors());
+docs.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, { explorer: true }));
 
 const PORT = process.env.PORT;
 
@@ -28,8 +29,6 @@ app.use('/events', eventRoutes);
 app.use('/users', userRoutes);
 app.use('/auth', authRoutes);
 app.use(errorHandler);
-
-docs.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 sequelize.authenticate()
     .then(() => console.log('Соединение с БД> установлено.'))
