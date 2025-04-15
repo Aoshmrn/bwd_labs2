@@ -7,29 +7,24 @@ router.post('/login', loginUser);
 
 /**
  * @swagger
+ * tags:
+ *   - name: Аутентификация
+ *     description: API для регистрации и входа
+ */
+
+/**
+ * @swagger
  * /auth/register:
  *   post:
- *     tags: [Аутентификация]
  *     summary: Регистрация нового пользователя
+ *     tags: [Аутентификация]
+ *     description: Создание нового аккаунта. Первый зарегистрированный пользователь становится администратором.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - email
- *               - name
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *               name:
- *                 type: string
- *               password:
- *                 type: string
- *                 format: password
+ *             $ref: '#/components/schemas/UserInput'
  *     responses:
  *       201:
  *         description: Пользователь успешно зарегистрирован
@@ -40,18 +35,9 @@ router.post('/login', loginUser);
  *               properties:
  *                 message:
  *                   type: string
+ *                   example: Регистрация успешна
  *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: integer
- *                     name:
- *                       type: string
- *                     email:
- *                       type: string
- *                     role:
- *                       type: string
- *                       enum: [user, admin]
+ *                   $ref: '#/components/schemas/User'
  *       400:
  *         description: Ошибка валидации
  *         content:
@@ -65,6 +51,7 @@ router.post('/login', loginUser);
  *   post:
  *     tags: [Аутентификация]
  *     summary: Вход в систему
+ *     description: Получение JWT токена для доступа к защищенным endpoints
  *     requestBody:
  *       required: true
  *       content:

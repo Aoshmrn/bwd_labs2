@@ -6,9 +6,10 @@ const userRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
 const publicRoutes = require('./routes/public');
 const errorHandler = require('./routes/error');
-const { swaggerUi, swaggerDocs } = require('./swagger');
+const { swaggerUi, swaggerDocs, swaggerUiOptions } = require('./swagger');
 const morgan = require('morgan');
 const passport = require('./config/passport.js');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 
@@ -20,7 +21,18 @@ app.use(passport.initialize());
 const docs = express();
 docs.use(express.json());
 docs.use(cors());
-docs.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, { explorer: true }));
+docs.use('/api-docs', (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = decoded;
+    } catch (err) {
+      console.error('Invalid token');
+    }
+  }
+  next();
+}, swaggerUi.serve, swaggerUi.setup(swaggerDocs, swaggerUiOptions));
 
 const PORT = process.env.PORT;
 

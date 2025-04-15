@@ -23,16 +23,19 @@ module.exports = router;
 /**
  * @swagger
  * tags:
- *   name: Мероприятия
- *   description: Управление мероприятиями
+ *   - name: События
+ *     description: API для управления событиями
  */
 
 /**
  * @swagger
  * /events:
  *   get:
- *     summary: Получить список мероприятий
- *     tags: [Мероприятия]
+ *     tags: [События]
+ *     summary: Получить список событий
+ *     security:
+ *       - bearerAuth: []
+ *     description: Доступно авторизованным пользователям
  *     parameters:
  *       - in: query
  *         name: category
@@ -48,42 +51,16 @@ module.exports = router;
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Event'
+ *       401:
+ *         description: Не авторизован
  *       500:
  *         description: Ошибка сервера
- */
-
-/**
- * @swagger
- * /events/{id}:
- *   get:
- *     summary: Получить мероприятие по ID
- *     tags: [Мероприятия]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID мероприятия
- *     responses:
- *       200:
- *         description: Мероприятие найдено
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Event'
- *       404:
- *         description: Мероприятие не найдено
- *       500:
- *         description: Ошибка сервера
- */
-
-/**
- * @swagger
- * /events:
  *   post:
- *     summary: Создать новое мероприятие
- *     tags: [Мероприятия]
+ *     tags: [События]
+ *     summary: Создать новое событие
+ *     security:
+ *       - bearerAuth: []
+ *     description: Доступно авторизованным пользователям
  *     requestBody:
  *       required: true
  *       content:
@@ -106,9 +83,33 @@ module.exports = router;
 /**
  * @swagger
  * /events/{id}:
+ *   get:
+ *     summary: Получить мероприятие по ID
+ *     tags: [События]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID мероприятия
+ *     responses:
+ *       200:
+ *         description: Мероприятие найдено
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Event'
+ *       404:
+ *         description: Мероприятие не найдено
+ *       500:
+ *         description: Ошибка сервера
  *   put:
- *     summary: Обновить мероприятие
- *     tags: [Мероприятия]
+ *     tags: [События]
+ *     summary: Обновить событие
+ *     security:
+ *       - bearerAuth: []
+ *     description: Доступно только создателю события или админу
  *     parameters:
  *       - in: path
  *         name: id
@@ -133,14 +134,12 @@ module.exports = router;
  *         description: Мероприятие не найдено
  *       500:
  *         description: Ошибка сервера
- */
-
-/**
- * @swagger
- * /events/{id}:
  *   delete:
- *     summary: Удалить мероприятие
- *     tags: [Мероприятия]
+ *     tags: [События]
+ *     summary: Удалить событие
+ *     security:
+ *       - bearerAuth: []
+ *     description: Доступно только создателю события или админу
  *     parameters:
  *       - in: path
  *         name: id

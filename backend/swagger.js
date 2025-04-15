@@ -20,6 +20,14 @@ const swaggerOptions = {
       },
     ],
     components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'JWT Authorization header using the Bearer scheme'
+        }
+      },
       schemas: {
         Error: {
           type: 'object',
@@ -74,18 +82,21 @@ const swaggerOptions = {
         },
         UserInput: {
           type: 'object',
-          required: ['name', 'email', 'password'],
+          required: ['email', 'name', 'password'],
           properties: {
-            name: {
-              type: 'string'
-            },
             email: {
               type: 'string',
-              format: 'email'
+              format: 'email',
+              example: 'user@example.com'
+            },
+            name: {
+              type: 'string',
+              example: 'John Doe'
             },
             password: {
               type: 'string',
-              format: 'password'
+              format: 'password',
+              example: '********'
             }
           }
         },
@@ -114,7 +125,36 @@ const swaggerOptions = {
             }
           }
         }
+      },
+      parameters: {
+        roleParam: {
+          in: 'header',
+          name: 'role',
+          schema: {
+            type: 'string',
+            enum: ['user', 'admin']
+          },
+          required: true,
+          description: 'User role'
+        }
       }
+    },
+    tags: [
+      {
+        name: 'Аутентификация',
+        description: 'Регистрация и вход в систему'
+      },
+      {
+        name: 'События',
+        description: 'Управление событиями (требуется авторизация)'
+      },
+      {
+        name: 'Пользователи',
+        description: 'Управление пользователями (только для админов)'
+      }
+    ],
+    security: {
+      bearerAuth: []
     }
   },
   apis: ['./routes/*.js'],
@@ -122,4 +162,22 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
-module.exports = { swaggerUi, swaggerDocs };
+// Custom Swagger UI configuration
+const swaggerUiOptions = {
+  swaggerOptions: {
+    persistAuthorization: true,
+    filter: true,
+    tagsSorter: 'alpha',
+    defaultModelsExpandDepth: -1,
+    docExpansion: 'list',
+    operationsSorter: 'method'
+  },
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'API Documentation',
+};
+
+module.exports = { 
+  swaggerUi, 
+  swaggerDocs,
+  swaggerUiOptions 
+};

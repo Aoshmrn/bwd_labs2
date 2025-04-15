@@ -6,8 +6,8 @@ const router = express.Router();
  * @swagger
  * /events:
  *   get:
- *     summary: Получить список всех мероприятий (публичный доступ)
- *     tags: [Публичный доступ]
+ *     summary: Получить список всех мероприятий
+ *     tags: [Public]
  *     parameters:
  *       - in: query
  *         name: category

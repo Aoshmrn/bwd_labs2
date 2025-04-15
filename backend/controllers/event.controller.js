@@ -41,18 +41,26 @@ async function getEventById(req, res, next)
 async function createEvent(req, res, next)
 {
     try {
-        const { title, description, date, category, createdBy } = req.body;
+        const { title, description, date, category } = req.body;
         const errors = [];
 
         if (!title) errors.push('Поле title обязательно');
         if (!date) errors.push('Поле date обязательно');
-        if (!createdBy) errors.push('Поле createdBy обязательно');
 
         if (errors.length > 0) {
             throw new ValidationError(errors);
         }
 
-        const event = await Event.create({ title, description, date, category, createdBy });
+        const createdBy = req.user.id;
+
+        const event = await Event.create({ 
+            title, 
+            description, 
+            date, 
+            category, 
+            createdBy 
+        });
+        
         res.status(201).json(event);
     } catch (error) {
         next(error);
