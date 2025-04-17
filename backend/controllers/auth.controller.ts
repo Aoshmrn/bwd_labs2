@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import User from '../models/user';
-import { ValidationError } from '../customErrors';
+import User from '@models/user';
+import { ValidationError } from '@/customErrors';
 
 export const registerUser = async (
   req: Request,

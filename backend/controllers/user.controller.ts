@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import User from '../models/user';
-import { NotFoundError, ValidationError, CustomError } from '../customErrors';
+import User from '@models/user';
+import { NotFoundError, ValidationError, CustomError } from '@/customErrors';
 import { Model, ModelStatic } from 'sequelize';
 
 interface AuthenticatedRequest extends Request {

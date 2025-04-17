@@ -9,7 +9,16 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["*"],
+      "@models/*": ["models/*"],
+      "@controllers/*": ["controllers/*"],
+      "@routes/*": ["routes/*"],
+      "@config/*": ["config/*"],
+      "@utils/*": ["utils/*"]
+    }
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules"]

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import Event from '../models/event';
-import User from '../models/user';
-import { NotFoundError, ValidationError } from '../customErrors';
+import Event from '@models/event';
+import User from '@models/user';
+import { NotFoundError, ValidationError } from '@/customErrors';
 
 export const getAllEvents = async (
   req: Request,
