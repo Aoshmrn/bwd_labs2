@@ -21,18 +21,23 @@ app.use(passport.initialize());
 const docs = express();
 docs.use(express.json());
 docs.use(cors());
-docs.use('/api-docs', (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (token) {
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = decoded;
-    } catch (err) {
-      console.error('Invalid token');
+docs.use(
+  '/api-docs',
+  (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+      } catch (err) {
+        console.error('Invalid token');
+      }
     }
-  }
-  next();
-}, swaggerUi.serve, swaggerUi.setup(swaggerDocs, swaggerUiOptions));
+    next();
+  },
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocs, swaggerUiOptions),
+);
 
 const PORT = process.env.PORT;
 
@@ -42,25 +47,30 @@ app.use('/users', userRoutes);
 app.use('/auth', authRoutes);
 app.use(errorHandler);
 
-sequelize.authenticate()
-    .then(() => console.log('Соединение с БД> установлено.'))
-    .catch((err) => console.error('Ошибка подключения к БД:', err));
+sequelize
+  .authenticate()
+  .then(() => console.log('Соединение с БД> установлено.'))
+  .catch((err) => console.error('Ошибка подключения к БД:', err));
 
-sequelize.sync()
-    .then(() => console.log('Модели синхронизированы с БД.'))
-    .catch((err) => console.error('Ошибка синхронизации моделей:', err));
+sequelize
+  .sync()
+  .then(() => console.log('Модели синхронизированы с БД.'))
+  .catch((err) => console.error('Ошибка синхронизации моделей:', err));
 
-app.listen(PORT, () => {
+app
+  .listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);
-}).on('error', (err) => {
+  })
+  .on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
-        console.error(`Порт ${PORT} занят. Используйте другой`);
+      console.error(`Порт ${PORT} занят. Используйте другой`);
+    } else {
+      console.error('Ошибка при запуске сервера:', err.message);
     }
-    else {
-        console.error('Ошибка при запуске сервера:', err.message);
-    }
-});
+  });
 
 docs.listen(5000, () => {
-    console.log(`Swagger UI доступен по адресу http://localhost:${5000}/api-docs`);
-  });
+  console.log(
+    `Swagger UI доступен по адресу http://localhost:${5000}/api-docs`,
+  );
+});

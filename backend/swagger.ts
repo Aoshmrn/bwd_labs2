@@ -1,8 +1,8 @@
-const swaggerJsDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
+import swaggerJsDoc, { Options } from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 
-const swaggerOptions = {
-  swaggerDefinition: {
+const swaggerOptions: Options = {
+  definition: {
     openapi: '3.0.0',
     info: {
       title: 'API для управления мероприятиями и пользователями',
@@ -153,11 +153,13 @@ const swaggerOptions = {
         description: 'Управление пользователями (только для админов)',
       },
     ],
-    security: {
-      bearerAuth: [],
-    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
-  apis: ['./routes/*.js'],
+  apis: ['./routes/*.ts'], // Убедитесь, что путь соответствует TypeScript-файлам
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
@@ -176,8 +178,4 @@ const swaggerUiOptions = {
   customSiteTitle: 'API Documentation',
 };
 
-module.exports = {
-  swaggerUi,
-  swaggerDocs,
-  swaggerUiOptions,
-};
+export { swaggerUi, swaggerDocs, swaggerUiOptions };

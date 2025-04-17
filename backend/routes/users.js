@@ -1,7 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const { createUser, getAllUser, updateUserRole, checkRole } = require("../controllers/user.controller");
+const {
+  createUser,
+  getAllUser,
+  updateUserRole,
+  checkRole,
+} = require('../controllers/user.controller');
 
 router.use(passport.authenticate('jwt', { session: false }));
 router.use(checkRole);

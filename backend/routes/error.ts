@@ -1,6 +1,12 @@
-const { CustomError } = require('../customErrors');
+import { Request, Response, NextFunction } from 'express';
+import { CustomError } from '../customErrors';
 
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void => {
   if (res.headersSent) {
     return next(err);
   }
@@ -9,20 +15,22 @@ const errorHandler = (err, req, res, next) => {
 
   // Обработка кастомных ошибок
   if (err instanceof CustomError) {
-    return res.status(err.statusCode).json({
+    res.status(err.statusCode).json({
       success: false,
       message: err.message,
       ...(err.errors && { errors: err.errors }),
     });
+    return;
   }
 
   // Обработка ошибок Sequelize
   if (err.name === 'SequelizeUniqueConstraintError') {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       message: 'Ошибка уникальности',
-      errors: err.errors.map((e) => e.message),
+      errors: err.errors.map((e: any) => e.message),
     });
+    return;
   }
 
   // Общая ошибка сервера
@@ -32,4 +40,4 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-module.exports = errorHandler;
+export default errorHandler;
