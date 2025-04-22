@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotFoundError = exports.ValidationError = exports.CustomError = void 0;
 class CustomError extends Error {
+    statusCode;
+    errors;
     constructor(message, statusCode) {
         super(message);
         this.statusCode = statusCode;
@@ -10,6 +12,7 @@ class CustomError extends Error {
 }
 exports.CustomError = CustomError;
 class ValidationError extends CustomError {
+    errors;
     constructor(errors) {
         super('Ошибка валидации', 400);
         this.errors = errors;

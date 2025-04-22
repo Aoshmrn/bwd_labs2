@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const customErrors_1 = require("../customErrors");
+const customErrors_1 = require("@/customErrors");
 const errorHandler = (err, req, res, next) => {
     if (res.headersSent) {
         return next(err);
@@ -8,7 +8,11 @@ const errorHandler = (err, req, res, next) => {
     console.error(err);
     // Обработка кастомных ошибок
     if (err instanceof customErrors_1.CustomError) {
-        res.status(err.statusCode).json(Object.assign({ success: false, message: err.message }, (err.errors && { errors: err.errors })));
+        res.status(err.statusCode).json({
+            success: false,
+            message: err.message,
+            ...(err.errors && { errors: err.errors }),
+        });
         return;
     }
     // Обработка ошибок Sequelize

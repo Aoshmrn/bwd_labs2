@@ -7,7 +7,6 @@ router.get('/events', getAllEvents);
 
 export default router;
 
-
 /**
  * @swagger
  * /events:

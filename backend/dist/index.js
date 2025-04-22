@@ -5,15 +5,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-const db_1 = __importDefault(require("./config/db"));
-const events_1 = __importDefault(require("./routes/events"));
-const users_1 = __importDefault(require("./routes/users"));
-const auth_1 = __importDefault(require("./routes/auth"));
-const public_1 = __importDefault(require("./routes/public"));
-const error_1 = __importDefault(require("./routes/error"));
-const swagger_1 = require("./swagger");
 const morgan_1 = __importDefault(require("morgan"));
-const passport_1 = __importDefault(require("./config/passport"));
+const db_1 = __importDefault(require("@config/db"));
+const events_1 = __importDefault(require("@routes/events"));
+const users_1 = __importDefault(require("@routes/users"));
+const auth_1 = __importDefault(require("@routes/auth"));
+const public_1 = __importDefault(require("@routes/public"));
+const error_1 = __importDefault(require("@routes/error"));
+const swagger_1 = require("@/swagger");
+const passport_1 = __importDefault(require("@config/passport"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
@@ -24,8 +24,7 @@ const docs = (0, express_1.default)();
 docs.use(express_1.default.json());
 docs.use((0, cors_1.default)());
 docs.use('/api-docs', (req, res, next) => {
-    var _a;
-    const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
+    const token = req.headers.authorization?.split(' ')[1];
     if (token) {
         try {
             const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);

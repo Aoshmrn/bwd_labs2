@@ -1,24 +1,25 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ES2022",
     "module": "CommonJS",
     "outDir": "dist",
     "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["*"],
+      "@/*": ["./*"],
       "@models/*": ["models/*"],
-      "@controllers/*": ["controllers/*"],
-      "@routes/*": ["routes/*"],
       "@config/*": ["config/*"],
-      "@utils/*": ["utils/*"]
+      "@routes/*": ["routes/*"],
+      "@controllers/*": ["controllers/*"]
     }
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules"]

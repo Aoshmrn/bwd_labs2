@@ -1,5 +1,7 @@
-import express, { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import cors from 'cors';
+import morgan from 'morgan';
 import sequelize from '@config/db';
 import eventRoutes from '@routes/events';
 import userRoutes from '@routes/users';
@@ -7,7 +9,6 @@ import authRoutes from '@routes/auth';
 import publicRoutes from '@routes/public';
 import errorHandler from '@routes/error';
 import { swaggerUi, swaggerDocs, swaggerUiOptions } from '@/swagger';
-import morgan from 'morgan';
 import passport from '@config/passport';
 import jwt from 'jsonwebtoken';
 

@@ -4,8 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
-const db_1 = __importDefault(require("../config/db"));
+const db_1 = __importDefault(require("@config/db"));
 class User extends sequelize_1.Model {
+    id;
+    name;
+    email;
+    password;
+    role;
+    createdAt;
 }
 User.init({
     id: {
