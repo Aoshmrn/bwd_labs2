@@ -1,0 +1,44 @@
+:root {
+  --primary-color: #4299e1;
+  --primary-color-alpha: rgba(66, 153, 225, 0.2);
+  --background-color: #ffffff;
+  --text-color: #2d3748;
+  --error-color: #e53e3e;
+  --success-color: #48bb78;
+  --border-color: #e2e8f0;
+
+  --transition-default: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  --transition-fast: 0.15s ease;
+
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+}
+
+[data-theme="dark"] {
+  --primary-color: #63b3ed;
+  --primary-color-alpha: rgba(99, 179, 237, 0.2);
+  --background-color: #1a202c;
+  --text-color: #e2e8f0;
+  --error-color: #fc8181;
+  --success-color: #68d391;
+  --border-color: #2d3748;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color var(--transition-default), color var(--transition-default);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}

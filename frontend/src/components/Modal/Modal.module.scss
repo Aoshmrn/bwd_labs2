@@ -1,0 +1,107 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalEnter 0.3s ease-out;
+
+  :global {
+    .Dialog_dialog {
+      transition: max-width var(--transition-default);
+    }
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+
+  h2 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+  }
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.5rem;
+  line-height: 1;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: var(--bg-secondary);
+  }
+}
+
+.content {
+  padding: 1.5rem;
+}
+
+.small {
+  :global {
+    .Dialog_dialog {
+      max-width: 400px;
+    }
+  }
+}
+
+.medium {
+  :global {
+    .Dialog_dialog {
+      max-width: 600px;
+    }
+  }
+}
+
+.large {
+  :global {
+    .Dialog_dialog {
+      max-width: 800px;
+    }
+  }
+}
+
+.full {
+  :global {
+    .Dialog_dialog {
+      max-width: 95vw;
+      max-height: 95vh;
+    }
+  }
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
