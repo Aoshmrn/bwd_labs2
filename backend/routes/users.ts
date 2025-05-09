@@ -9,10 +9,14 @@ import {
 
 const router = express.Router();
 
+// Apply authentication to all routes
 router.use(passport.authenticate('jwt', { session: false }));
-router.use(checkRole);
 
+// Public route for authenticated users
 router.get('/', getAllUser);
+
+// Admin only routes
+router.use(checkRole); 
 router.post('/', createUser);
 router.patch('/:id/role', updateUserRole);
 

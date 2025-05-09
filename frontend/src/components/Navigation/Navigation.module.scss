@@ -186,6 +186,18 @@
   border-bottom: 1px solid var(--border-color);
   color: var(--text-primary);
   font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.adminBadge {
+  font-size: 0.75rem;
+  background-color: #FFB74D;
+  color: #333;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
 }
 
 .dropdownItem {

@@ -17,12 +17,12 @@ class User
   extends Model<UserAttributes, UserCreationAttributes>
   implements UserAttributes
 {
-  public id!: number;
-  public name!: string;
-  public email!: string;
-  public password!: string;
-  public role!: 'user' | 'admin';
-  public readonly createdAt!: Date;
+  declare id: number;
+  declare name: string;
+  declare email: string;
+  declare password: string;
+  declare role: 'user' | 'admin';
+  declare readonly createdAt: Date;
 }
 
 User.init(

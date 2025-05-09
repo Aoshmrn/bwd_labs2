@@ -11,14 +11,14 @@ export interface Event {
 
 export interface CreateEventData {
   title: string;
-  description: string;
+  description?: string;
   date: string;
-  category: string;
+  category?: string;
 }
 
 export const getAllEvents = async () => {
   try {
-    const response = await baseApi.get<Event[]>('/api/events');
+    const response = await baseApi.get<Event[]>('/events');
     return response.data;
   } catch (error) {
     console.error('Failed to fetch events:', error);
@@ -28,7 +28,7 @@ export const getAllEvents = async () => {
 
 export const getEventById = async (id: number) => {
   try {
-    const response = await baseApi.get<Event>(`/api/events/${id}`);
+    const response = await baseApi.get<Event>(`/events/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Failed to fetch event ${id}:`, error);
@@ -38,7 +38,14 @@ export const getEventById = async (id: number) => {
 
 export const createEvent = async (data: CreateEventData) => {
   try {
-    const response = await baseApi.post<Event>('/api/events', data);
+    // Ensure the data has empty strings for optional fields if they're not provided
+    const eventData = {
+      ...data,
+      description: data.description || '',
+      category: data.category || ''
+    };
+    
+    const response = await baseApi.post<Event>('/events', eventData);
     return response.data;
   } catch (error) {
     console.error('Failed to create event:', error);
@@ -48,7 +55,7 @@ export const createEvent = async (data: CreateEventData) => {
 
 export const updateEvent = async (id: number, data: Partial<CreateEventData>) => {
   try {
-    const response = await baseApi.put<Event>(`/api/events/${id}`, data);
+    const response = await baseApi.put<Event>(`/events/${id}`, data);
     return response.data;
   } catch (error) {
     console.error(`Failed to update event ${id}:`, error);
@@ -58,7 +65,7 @@ export const updateEvent = async (id: number, data: Partial<CreateEventData>) =>
 
 export const deleteEvent = async (id: number) => {
   try {
-    await baseApi.delete(`/api/events/${id}`);
+    await baseApi.delete(`/events/${id}`);
   } catch (error) {
     console.error(`Failed to delete event ${id}:`, error);
     throw error;

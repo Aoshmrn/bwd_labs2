@@ -1,40 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Login.module.scss';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, error: authError, loading, user, clearError } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [error, setError] = useState<string>('');
 
+  useEffect(() => {
+    if (user) navigate('/');
+    if (clearError) clearError();
+  }, [user, navigate, clearError]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (error) setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
+    if (!formData.email.trim()) {
+      setError('Введите email');
+      return;
+    }
+
+    if (!formData.password.trim()) {
+      setError('Введите пароль');
+      return;
+    }
+
     try {
-      // Simulating login API call
-      // Replace with actual API call
-      login({
-        id: 1,
-        username: formData.email.split('@')[0],
-        email: formData.email
+      await login({
+        email: formData.email.trim(),
+        password: formData.password
       });
-      navigate('/');
-    } catch (err) {
-      setError('Неверный email или пароль');
+    } catch (err: any) {
+      setError(typeof err === 'string' ? err : (authError || 'Ошибка при входе в систему'));
     }
   };
 
@@ -66,7 +75,9 @@ const Login: React.FC = () => {
           />
         </div>
 
-        <button type="submit">Войти</button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Вход...' : 'Войти'}
+        </button>
         <Link to="/register" className={styles.link}>
           Нет аккаунта? Зарегистрироваться
         </Link>

@@ -1,0 +1,101 @@
+.container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 4rem;
+}
+
+h1 {
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+}
+
+.error {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #fff5f5;
+  color: #e53e3e;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.usersList {
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.usersHeader {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  padding: 1rem;
+  background-color: var(--bg-secondary);
+  font-weight: 500;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.userItem {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &:hover {
+    background-color: var(--bg-secondary);
+  }
+}
+
+.name, .email, .role {
+  display: flex;
+  align-items: center;
+}
+
+.adminBadge, .userBadge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.adminBadge {
+  background-color: #FFB74D;
+  color: #333;
+}
+
+.userBadge {
+  background-color: #E0E0E0;
+  color: #555;
+}
+
+@media (max-width: 768px) {
+  .usersHeader, .userItem {
+    grid-template-columns: 1fr 1fr;
+    
+    .email {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .usersHeader, .userItem {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
+
+.noUsers {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  grid-column: 1 / -1;
+} 

@@ -18,12 +18,12 @@ class Event
   extends Model<EventAttributes, EventCreationAttributes>
   implements EventAttributes
 {
-  public id!: number;
-  public title!: string;
-  public description?: string;
-  public date!: Date;
-  public category?: 'концерт' | 'лекция' | 'выставка';
-  public createdBy!: number;
+  declare id: number;
+  declare title: string;
+  declare description?: string;
+  declare date: Date;
+  declare category?: 'концерт' | 'лекция' | 'выставка';
+  declare createdBy: number;
 }
 
 Event.init(

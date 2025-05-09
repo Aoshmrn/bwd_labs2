@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { register } from '../../api/authService';
 import styles from './Register.module.scss';
+
+interface RegisterForm {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -12,6 +20,7 @@ const Register: React.FC = () => {
     password: '',
     confirmPassword: ''
   });
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,16 +41,27 @@ const Register: React.FC = () => {
     }
 
     try {
-      // Simulating registration API call
-      // Replace with actual API call
-      login({
-        id: 1,
-        username: formData.username,
-        email: formData.email
+      setLoading(true);
+      // First register the user
+      await register({
+        name: formData.username,
+        email: formData.email,
+        password: formData.password
       });
+      
+      // Then log them in automatically
+      await login({
+        email: formData.email,
+        password: formData.password
+      });
+      
+      // Redirect to home page after successful registration and login
       navigate('/');
-    } catch (err) {
-      setError('Ошибка при регистрации');
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      setError(err.message || 'Ошибка при регистрации');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -95,7 +115,9 @@ const Register: React.FC = () => {
           />
         </div>
 
-        <button type="submit">Зарегистрироваться</button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Регистрация...' : 'Зарегистрироваться'}
+        </button>
         <Link to="/login" className={styles.link}>
           Уже есть аккаунт? Войти
         </Link>

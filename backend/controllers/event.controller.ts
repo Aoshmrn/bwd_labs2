@@ -49,19 +49,28 @@ export const createEvent = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const { title, description, date, category, createdBy } = req.body;
-    if (!title || !date || !category || !createdBy) {
+    const { title, description, date, category } = req.body;
+    
+    const userId = req.user?.id;
+    
+    if (!title || !date) {
       throw new ValidationError([
-        'Все обязательные поля должны быть заполнены',
+        'Название и дата события обязательны',
       ]);
     }
-    const event = await Event.create({
+    
+    const eventData: any = {
       title,
-      description,
+      description: description || '',
       date,
-      category,
-      createdBy,
-    });
+      createdBy: userId,
+    };
+    
+    if (category && category.trim() !== '') {
+      eventData.category = category;
+    }
+    
+    const event = await Event.create(eventData);
     res.status(201).json(event);
   } catch (error) {
     next(error);
@@ -80,10 +89,17 @@ export const updateEvent = async (
     if (!event) {
       throw new NotFoundError('Событие');
     }
+    
     event.title = title;
-    event.description = description;
+    event.description = description || '';
     event.date = date;
-    event.category = category;
+    
+    if (category && category.trim() !== '') {
+      event.category = category;
+    } else {
+      event.category = undefined;
+    }
+      
     await event.save();
     res.status(200).json(event);
   } catch (error) {

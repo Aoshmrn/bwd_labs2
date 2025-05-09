@@ -9,7 +9,7 @@ interface AuthenticatedRequest extends Request {
     id: number;
     role: string;
   };
-  sequelizeModel?: typeof Model;
+  sequelizeModel?: any;
 }
 
 export const getAllUser = async (
@@ -109,9 +109,7 @@ export const checkOwnership = async (
     }
 
     const { id } = req.params;
-    const resource = await (req.sequelizeModel as ModelStatic<Model>)?.findByPk(
-      id,
-    );
+    const resource = await req.sequelizeModel?.findByPk(id);
 
     if (!resource) {
       throw new NotFoundError('Ресурс');

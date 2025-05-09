@@ -5,7 +5,7 @@ import { useTheme } from '../../hooks/useTheme';
 import styles from './Navigation.module.scss';
 
 const Navigation: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,6 +43,16 @@ const Navigation: React.FC = () => {
         <Link to="/events" className={styles.navLink}>
           Все события
         </Link>
+        {user && (
+          <Link to="/my-events" className={styles.navLink}>
+            Мои события
+          </Link>
+        )}
+        {isAdmin && (
+          <Link to="/users" className={styles.navLink}>
+            Пользователи
+          </Link>
+        )}
       </div>
       <div className={styles.rightSection}>
         <button 
@@ -63,13 +73,21 @@ const Navigation: React.FC = () => {
             </div>
             {isMenuOpen && (
               <div className={styles.dropdown}>
-                <div className={styles.username}>{user.username}</div>
+                <div className={styles.username}>
+                  {user.username}
+                  {isAdmin && <span className={styles.adminBadge}>Админ</span>}
+                </div>
                 <Link to="/profile" className={styles.dropdownItem}>
                   Профиль
                 </Link>
                 <Link to="/my-events" className={styles.dropdownItem}>
                   Мои события
                 </Link>
+                {isAdmin && (
+                  <Link to="/users" className={styles.dropdownItem}>
+                    Пользователи
+                  </Link>
+                )}
                 <button onClick={handleLogout} className={styles.dropdownItem}>
                   Выйти
                 </button>

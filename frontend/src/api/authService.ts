@@ -22,24 +22,32 @@ interface AuthResponse {
 
 export const login = async (data: LoginData): Promise<AuthResponse> => {
   try {
-    const response = await baseApi.post<AuthResponse>('/auth/login', data);
-    const { token } = response.data;
-    setToken(token);
+    if (!data.email) throw new Error('Email is required');
+    if (!data.password) throw new Error('Password is required');
+    
+    const response = await baseApi.post<AuthResponse>('/auth/login', {
+      email: data.email,
+      password: data.password
+    });
+    
+    setToken(response.data.token);
     return response.data;
-  } catch (error) {
-    console.error('Login error:', error);
+  } catch (error: any) {
+    console.error('Login failed:', error);
     throw error;
   }
 };
 
 export const register = async (data: RegisterData): Promise<AuthResponse> => {
   try {
+    if (!data.name) throw new Error('Name is required');
+    if (!data.email) throw new Error('Email is required');
+    if (!data.password) throw new Error('Password is required');
+    
     const response = await baseApi.post<AuthResponse>('/auth/register', data);
-    const { token } = response.data;
-    setToken(token);
+    setToken(response.data.token);
     return response.data;
   } catch (error) {
-    console.error('Registration error:', error);
     throw error;
   }
 };

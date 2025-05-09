@@ -18,7 +18,7 @@ const EventForm: React.FC<EventFormProps> = ({ onSuccess }) => {
     error,
     handleChange,
     handleSubmit,
-    resetForm
+    setFormData
   } = useForm({
     initialState: {
       title: '',
@@ -30,7 +30,12 @@ const EventForm: React.FC<EventFormProps> = ({ onSuccess }) => {
       try {
         await createEvent(data);
         showToast('Event created successfully', 'success');
-        resetForm();
+        setFormData({
+          title: '',
+          description: '',
+          date: '',
+          category: '',
+        });
         onSuccess();
       } catch (err) {
         showToast('Failed to create event', 'error');
@@ -40,6 +45,14 @@ const EventForm: React.FC<EventFormProps> = ({ onSuccess }) => {
   });
 
   if (loading) return <LoadingSpinner />;
+
+  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    handleChange(e as any);
+  };
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    handleChange(e as any);
+  };
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
@@ -61,8 +74,7 @@ const EventForm: React.FC<EventFormProps> = ({ onSuccess }) => {
           name="description"
           placeholder="Event Description"
           value={formData.description}
-          onChange={handleChange}
-          required
+          onChange={handleTextAreaChange}
           minLength={10}
         />
       </div>
@@ -76,18 +88,22 @@ const EventForm: React.FC<EventFormProps> = ({ onSuccess }) => {
         />
       </div>
       <div className={styles.formGroup}>
-        <input
-          type="text"
+        <select
           name="category"
-          placeholder="Event Category"
           value={formData.category}
-          onChange={handleChange}
-          required
-        />
+          onChange={handleSelectChange}
+        >
+          <option value="">Не выбрано</option>
+          <option value="концерт">Концерт</option>
+          <option value="лекция">Лекция</option>
+          <option value="выставка">Выставка</option>
+        </select>
       </div>
-      <button type="submit" disabled={loading}>
-        {loading ? 'Creating...' : 'Create Event'}
-      </button>
+      <div className={styles.buttonContainer}>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Creating...' : 'Create Event'}
+        </button>
+      </div>
     </form>
   );
 };

@@ -2,8 +2,12 @@ import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import passport from 'passport';
 import User from '@models/user';
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config({ path: '../.env' });
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
+
+// Use a default JWT secret if environment variable is not available
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
 
 interface JwtPayload {
   id: number;
@@ -11,7 +15,7 @@ interface JwtPayload {
 
 const options = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET as string,
+  secretOrKey: JWT_SECRET,
 };
 
 passport.use(

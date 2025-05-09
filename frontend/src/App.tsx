@@ -11,16 +11,16 @@ const App = () => {
   return (
     <ErrorBoundary>
       <LoadingProvider>
-        <AuthProvider>
-          <Router>
+        <Router>
+          <AuthProvider>
             <div className="app">
               <Navigation />
               <main className="main-content">
                 <AppRoutes />
               </main>
             </div>
-          </Router>
-        </AuthProvider>
+          </AuthProvider>
+        </Router>
       </LoadingProvider>
     </ErrorBoundary>
   );

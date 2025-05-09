@@ -4,7 +4,7 @@ interface UseAsyncReturn<T> {
   data: T | null;
   loading: boolean;
   error: string | null;
-  execute: (...args: any[]) => Promise<void>;
+  execute: (...args: any[]) => Promise<T>;
 }
 
 export const useAsync = <T>(

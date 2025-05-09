@@ -1,17 +1,15 @@
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config({ path: '../.env' });
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
 
-const sequelize = new Sequelize(
-  process.env.DB_NAME as string,
-  process.env.DB_USER as string,
-  process.env.DB_PASSWORD as string,
-  {
-    host: process.env.DB_HOST,
-    dialect: 'postgres',
-    logging: false,
-  },
-);
+// Try with direct hardcoded values for testing
+const sequelize = new Sequelize('postgres', 'postgres', '220504', {
+  host: 'localhost',
+  port: 5432,
+  dialect: 'postgres',
+  logging: false,
+});
 
 export default sequelize;

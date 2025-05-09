@@ -45,7 +45,6 @@ export const Avatar: React.FC<AvatarProps> = ({ onLogout }) => {
   return (
     <div className={styles.avatarContainer}>
       <div ref={avatarRef} className={styles.avatar} onClick={toggleMenu}>
-        {/* Можно добавить случайную картинку или инициалы */}
         <span>👤</span>
       </div>
       {isMenuOpen && (

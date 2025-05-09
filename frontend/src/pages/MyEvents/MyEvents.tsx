@@ -1,48 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useEvents } from '../../hooks/useEvents';
 import { Modal } from '../../components/Modal/Modal';
 import { EventForm } from '../../components/EventForm/EventForm';
+import { Loading } from '../../components/Loading/Loading';
 import styles from './MyEvents.module.scss';
+
+interface EventFormData {
+  title: string;
+  description: string;
+  date: string;
+  category?: string;
+}
 
 const MyEvents: React.FC = () => {
   const { user } = useAuth();
-  const [events, setEvents] = useState<Event[]>([]);
+  const { events, loading, error, fetchEvents, createEvent, updateEvent, deleteEvent } = useEvents();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [editingEvent, setEditingEvent] = useState<any | null>(null);
 
-  const handleCreateEvent = (data: Omit<Event, 'id' | 'userId'>) => {
-    const newEvent = {
-      ...data,
-      id: Date.now(),
-      userId: user?.id || 0,
-    };
-    setEvents([...events, newEvent]);
-    setIsModalOpen(false);
-  };
+  // Fetch events on component mount
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
-  const handleEditEvent = (data: Omit<Event, 'id' | 'userId'>) => {
-    if (editingEvent) {
-      setEvents(events.map(event =>
-        event.id === editingEvent.id
-          ? { ...event, ...data }
-          : event
-      ));
-      setEditingEvent(null);
+  // Filter events to show only the current user's events
+  const myEvents = events.filter(event => event.userId === user?.id);
+
+  const handleCreateEvent = async (data: EventFormData) => {
+    try {
+      await createEvent(data);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Failed to create event:', error);
     }
   };
 
-  const handleDelete = (id: number) => {
-    setEvents(events.filter(event => event.id !== id));
+  const handleEditEvent = async (data: EventFormData) => {
+    if (editingEvent) {
+      try {
+        await updateEvent(editingEvent.id, data);
+        setEditingEvent(null);
+      } catch (error) {
+        console.error('Failed to update event:', error);
+      }
+    }
   };
 
-  const handleEdit = (event: Event) => {
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteEvent(id);
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+    }
+  };
+
+  const handleEdit = (event: any) => {
     setEditingEvent(event);
   };
+
+  if (loading && events.length === 0) {
+    return <Loading />;
+  }
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h1>Мои события</h1>
+      </div>
+      
+      <div className={styles.createButtonContainer}>
         <button 
           className={styles.createButton}
           onClick={() => setIsModalOpen(true)}
@@ -51,15 +78,24 @@ const MyEvents: React.FC = () => {
         </button>
       </div>
       
+      {error && <div className={styles.error}>{error}</div>}
+      
       <div className={styles.eventsList}>
-        {events.length > 0 ? (
-          events.map((event) => (
+        {myEvents.length > 0 ? (
+          myEvents.map((event) => (
             <div key={event.id} className={styles.eventCard}>
               <h3>{event.title}</h3>
               <p>{event.description}</p>
-              <p className={styles.date}>{event.date}</p>
+              {event.category && (
+                <span className={styles.category}>
+                  {event.category}
+                </span>
+              )}
+              <p className={styles.date}>
+                {new Date(event.date).toLocaleDateString('ru-RU')}
+              </p>
               <div className={styles.actions}>
-                <button onClick={() => handleEdit(event)}>
+                <button onClick={() => handleEdit(event)} className={styles.editButton}>
                   Редактировать
                 </button>
                 <button 

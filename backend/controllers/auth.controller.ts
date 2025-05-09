@@ -3,6 +3,12 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '@models/user';
 import { ValidationError } from '@/customErrors';
+import dotenv from 'dotenv';
+import path from 'path';
+
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
+
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
 
 export const registerUser = async (
   req: Request,
@@ -27,7 +33,22 @@ export const registerUser = async (
       password: hashedPassword,
       role: userCount === 0 ? 'admin' : 'user',
     });
-    res.status(201).json({ message: 'Регистрация успешна', user });
+
+    // Generate JWT token after registration
+    const token = jwt.sign({ id: user.id }, JWT_SECRET, {
+      expiresIn: '1h',
+    });
+
+    res.status(201).json({
+      message: 'Регистрация успешна',
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
   } catch (error) {
     next(error);
   }
@@ -43,14 +64,31 @@ export const loginUser = async (
     if (!email || !password) {
       throw new ValidationError(['Email и пароль обязательны']);
     }
+
     const user = await User.findOne({ where: { email } });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      throw new ValidationError(['Неверные учетные данные']);
+    if (!user) {
+      throw new ValidationError(['Пользователь с таким email не найден']);
     }
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      throw new ValidationError(['Неверный пароль']);
+    }
+
+    const token = jwt.sign({ id: user.id }, JWT_SECRET, {
       expiresIn: '1h',
     });
-    res.status(200).json({ message: 'Вход успешен', token });
+
+    res.status(200).json({
+      message: 'Вход успешен',
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
   } catch (error) {
     next(error);
   }

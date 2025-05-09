@@ -12,7 +12,7 @@ import {
 
 declare module 'express-serve-static-core' {
   interface Request {
-    model?: typeof Event;
+    sequelizeModel?: typeof Event;
     user?: { id: number; role: string };
   }
 }
@@ -22,7 +22,7 @@ const router = express.Router();
 router.use(passport.authenticate('jwt', { session: false }));
 
 router.use((req: Request, res: Response, next: NextFunction) => {
-  req.model = Event;
+  req.sequelizeModel = Event;
   next();
 });
 

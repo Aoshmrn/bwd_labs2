@@ -5,6 +5,7 @@ interface EventFormData {
   title: string;
   description: string;
   date: string;
+  category: string;
 }
 
 interface EventFormProps {
@@ -21,7 +22,8 @@ export const EventForm: React.FC<EventFormProps> = ({
   const [formData, setFormData] = useState<EventFormData>({
     title: '',
     description: '',
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split('T')[0],
+    category: ''
   });
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export const EventForm: React.FC<EventFormProps> = ({
   }, [initialData]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -66,8 +68,22 @@ export const EventForm: React.FC<EventFormProps> = ({
           name="description"
           value={formData.description}
           onChange={handleChange}
-          required
         />
+      </div>
+
+      <div className={styles.formGroup}>
+        <label htmlFor="category">Категория</label>
+        <select
+          id="category"
+          name="category"
+          value={formData.category}
+          onChange={handleChange}
+        >
+          <option value="">Не выбрано</option>
+          <option value="концерт">Концерт</option>
+          <option value="лекция">Лекция</option>
+          <option value="выставка">Выставка</option>
+        </select>
       </div>
 
       <div className={styles.formGroup}>
@@ -82,13 +98,15 @@ export const EventForm: React.FC<EventFormProps> = ({
         />
       </div>
 
-      <div className={styles.actions}>
-        <button type="submit">
-          {initialData ? 'Сохранить' : 'Создать'}
-        </button>
-        <button type="button" onClick={onCancel} className={styles.cancelButton}>
-          Отмена
-        </button>
+      <div className={styles.actionsContainer}>
+        <div className={styles.actions}>
+          <button type="submit">
+            {initialData ? 'Сохранить' : 'Создать'}
+          </button>
+          <button type="button" onClick={onCancel} className={styles.cancelButton}>
+            Отмена
+          </button>
+        </div>
       </div>
     </form>
   );

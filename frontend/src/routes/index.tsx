@@ -1,7 +1,23 @@
 import React, { Suspense } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import { Loading } from '../components/Loading/Loading';
 import { PrivateRoute } from '../components/PrivateRoute/PrivateRoute';
+import { useAuth } from '../contexts/AuthContext';
+
+// Create AdminRoute component for admin-only routes
+const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isAdmin } = useAuth();
+  
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+  
+  if (!isAdmin) {
+    return <Navigate to="/" />;
+  }
+  
+  return <>{children}</>;
+};
 
 const Home = React.lazy(() => import('../pages/Home/Home'));
 const Events = React.lazy(() => import('../pages/Events/Events'));
@@ -9,6 +25,7 @@ const Login = React.lazy(() => import('../pages/Login/Login'));
 const Register = React.lazy(() => import('../pages/Register/Register'));
 const Profile = React.lazy(() => import('../pages/Profile/Profile'));
 const MyEvents = React.lazy(() => import('../pages/MyEvents/MyEvents'));
+const Users = React.lazy(() => import('../pages/Users/Users'));
 const NotFound = React.lazy(() => import('../pages/NotFound/NotFound'));
 
 const AppRoutes: React.FC = () => {
@@ -33,6 +50,14 @@ const AppRoutes: React.FC = () => {
             <PrivateRoute>
               <MyEvents />
             </PrivateRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <AdminRoute>
+              <Users />
+            </AdminRoute>
           }
         />
         <Route path="*" element={<NotFound />} />
