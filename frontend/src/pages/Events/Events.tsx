@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useEvents } from '../../hooks/useEvents';
-import { useAuth } from '../../contexts/AuthContext';
 import { Loading } from '../../components/Loading/Loading';
 import styles from './Events.module.scss';
 
-// Category display mapping
 const categoryLabels: Record<string, string> = {
   'концерт': 'Концерт',
   'лекция': 'Лекция',
   'выставка': 'Выставка'
 };
 
-// All available categories for the filter
 const allCategories = ['концерт', 'лекция', 'выставка'];
 
 const Events: React.FC = () => {
-  const { user } = useAuth();
-  const { events, loading, error, fetchEvents, deleteEvent } = useEvents();
+  const { events, loading, error, fetchEvents } = useEvents();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'date' | 'title'>('date');
   const [categoryFilter, setCategoryFilter] = useState<string>('');
@@ -24,18 +20,6 @@ const Events: React.FC = () => {
   useEffect(() => {
     fetchEvents();
   }, [fetchEvents]);
-
-  const handleDeleteEvent = async (id: number) => {
-    if (window.confirm('Вы уверены, что хотите удалить это событие?')) {
-      try {
-        await deleteEvent(id);
-      } catch (error) {
-        console.error('Failed to delete event:', error);
-      }
-    }
-  };
-
-  const isAdmin = user?.role === 'admin';
 
   const filteredEvents = events
     .filter(event => 
@@ -83,7 +67,7 @@ const Events: React.FC = () => {
             <option value="">Все категории</option>
             {allCategories.map(category => (
               <option key={category} value={category}>
-                {categoryLabels[category as keyof typeof categoryLabels]} ({eventsByCategory[category] || 0})
+                {categoryLabels[category]} ({eventsByCategory[category] || 0})
               </option>
             ))}
           </select>
@@ -108,31 +92,20 @@ const Events: React.FC = () => {
               <h3>{event.title}</h3>
               <p>{event.description}</p>
               <div className={styles.eventMeta}>
-                {event.category ? (
+                {event.category && (
                   <span className={styles.category}>
-                    {categoryLabels[event.category as keyof typeof categoryLabels] || event.category}
+                    {categoryLabels[event.category] || event.category}
                   </span>
-                ) : null}
+                )}
                 <span className={styles.date}>
                   {new Date(event.date).toLocaleDateString('ru-RU')}
                 </span>
               </div>
-              
-              {isAdmin && (
-                <div className={styles.actions}>
-                  <button 
-                    onClick={() => handleDeleteEvent(event.id)}
-                    className={styles.deleteButton}
-                  >
-                    Удалить
-                  </button>
-                </div>
-              )}
             </div>
           ))
         ) : (
           <div className={styles.noEvents}>
-            {categoryFilter ? `События категории "${categoryLabels[categoryFilter as keyof typeof categoryLabels]}" не найдены` : 
+            {categoryFilter ? `События категории "${categoryLabels[categoryFilter]}" не найдены` : 
              searchTerm ? 'События не найдены' : 'Нет доступных событий'}
           </div>
         )}

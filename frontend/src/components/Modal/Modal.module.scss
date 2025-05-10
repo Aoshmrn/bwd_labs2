@@ -1,4 +1,4 @@
-.overlay {
+.backdrop {
   position: fixed;
   top: 0;
   left: 0;
@@ -9,7 +9,6 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  backdrop-filter: blur(2px);
 }
 
 .modal {
@@ -20,7 +19,7 @@
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
-  animation: modalEnter 0.3s ease-out;
+  animation: slideIn 0.3s ease-out;
 
   :global {
     .Dialog_dialog {
@@ -49,12 +48,16 @@
   font-size: 1.5rem;
   color: var(--text-secondary);
   cursor: pointer;
-  padding: 0.5rem;
-  line-height: 1;
-  border-radius: 4px;
+  padding: 0.25rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
 
   &:hover {
-    background-color: var(--bg-secondary);
+    color: var(--text-primary);
   }
 }
 
@@ -95,13 +98,13 @@
   }
 }
 
-@keyframes modalEnter {
+@keyframes slideIn {
   from {
+    transform: translateY(-20px);
     opacity: 0;
-    transform: scale(0.95);
   }
   to {
+    transform: translateY(0);
     opacity: 1;
-    transform: scale(1);
   }
 }

@@ -1,62 +1,98 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useEvents } from '../../hooks/useEvents';
-import { Modal } from '../../components/Modal/Modal';
-import { EventForm } from '../../components/EventForm/EventForm';
 import { Loading } from '../../components/Loading/Loading';
+import { EventFormModal, EventFormData } from '../../components/EventFormModal/EventFormModal';
+import { useNotification } from '../../contexts/NotificationContext';
 import styles from './MyEvents.module.scss';
 
-interface EventFormData {
-  title: string;
-  description: string;
-  date: string;
-  category?: string;
-}
+const categoryLabels: Record<string, string> = {
+  'концерт': 'Концерт',
+  'лекция': 'Лекция',
+  'выставка': 'Выставка'
+};
 
 const MyEvents: React.FC = () => {
   const { user } = useAuth();
-  const { events, loading, error, fetchEvents, createEvent, updateEvent, deleteEvent } = useEvents();
+  const { events, loading, error, fetchEvents, deleteEvent, createEvent, updateEvent } = useEvents();
+  const { addNotification } = useNotification();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<any | null>(null);
+  const [editingEvent, setEditingEvent] = useState<EventFormData | null>(null);
 
-  // Fetch events on component mount
   useEffect(() => {
     fetchEvents();
   }, [fetchEvents]);
 
-  // Filter events to show only the current user's events
   const myEvents = events.filter(event => event.userId === user?.id);
 
   const handleCreateEvent = async (data: EventFormData) => {
     try {
-      await createEvent(data);
+      await createEvent({
+        ...data,
+        date: new Date(data.date).toISOString()
+      });
+      await fetchEvents();
       setIsModalOpen(false);
+      addNotification('Событие успешно создано', 'success');
     } catch (error) {
       console.error('Failed to create event:', error);
+      addNotification('Ошибка при создании события', 'error');
     }
   };
 
   const handleEditEvent = async (data: EventFormData) => {
-    if (editingEvent) {
+    if (!editingEvent?.id) {
+      addNotification('Ошибка: не найден ID события', 'error');
+      return;
+    }
+    
+    try {
+      await updateEvent(editingEvent.id, {
+        ...data,
+        date: new Date(data.date).toISOString()
+      });
+      await fetchEvents();
+      setEditingEvent(null);
+      setIsModalOpen(false);
+      addNotification('Событие успешно обновлено', 'success');
+    } catch (error) {
+      console.error('Failed to update event:', error);
+      addNotification('Ошибка при обновлении события', 'error');
+    }
+  };
+
+  const handleDeleteEvent = async (id: number) => {
+    if (window.confirm('Вы уверены, что хотите удалить это событие?')) {
       try {
-        await updateEvent(editingEvent.id, data);
-        setEditingEvent(null);
+        await deleteEvent(id);
+        await fetchEvents();
+        addNotification('Событие успешно удалено', 'success');
       } catch (error) {
-        console.error('Failed to update event:', error);
+        console.error('Failed to delete event:', error);
+        addNotification('Ошибка при удалении события', 'error');
       }
     }
   };
 
-  const handleDelete = async (id: number) => {
-    try {
-      await deleteEvent(id);
-    } catch (error) {
-      console.error('Failed to delete event:', error);
-    }
+  const handleOpenCreateModal = () => {
+    setEditingEvent(null);
+    setIsModalOpen(true);
   };
 
-  const handleEdit = (event: any) => {
-    setEditingEvent(event);
+  const handleOpenEditModal = (event: any) => {
+    setEditingEvent({
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      date: new Date(event.date).toISOString().split('T')[0],
+      category: event.category || ''
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingEvent(null);
   };
 
   if (loading && events.length === 0) {
@@ -68,11 +104,10 @@ const MyEvents: React.FC = () => {
       <div className={styles.header}>
         <h1>Мои события</h1>
       </div>
-      
       <div className={styles.createButtonContainer}>
         <button 
           className={styles.createButton}
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleOpenCreateModal}
         >
           Создать событие
         </button>
@@ -86,20 +121,25 @@ const MyEvents: React.FC = () => {
             <div key={event.id} className={styles.eventCard}>
               <h3>{event.title}</h3>
               <p>{event.description}</p>
-              {event.category && (
-                <span className={styles.category}>
-                  {event.category}
+              <div className={styles.eventMeta}>
+                {event.category && (
+                  <span className={styles.category}>
+                    {categoryLabels[event.category] || event.category}
+                  </span>
+                )}
+                <span className={styles.date}>
+                  {new Date(event.date).toLocaleDateString('ru-RU')}
                 </span>
-              )}
-              <p className={styles.date}>
-                {new Date(event.date).toLocaleDateString('ru-RU')}
-              </p>
+              </div>
               <div className={styles.actions}>
-                <button onClick={() => handleEdit(event)} className={styles.editButton}>
+                <button 
+                  onClick={() => handleOpenEditModal(event)}
+                  className={styles.editButton}
+                >
                   Редактировать
                 </button>
                 <button 
-                  onClick={() => handleDelete(event.id)}
+                  onClick={() => handleDeleteEvent(event.id)}
                   className={styles.deleteButton}
                 >
                   Удалить
@@ -112,23 +152,13 @@ const MyEvents: React.FC = () => {
         )}
       </div>
 
-      <Modal
-        isOpen={isModalOpen || !!editingEvent}
-        onClose={() => {
-          setIsModalOpen(false);
-          setEditingEvent(null);
-        }}
-        title={editingEvent ? 'Редактировать событие' : 'Создать событие'}
-      >
-        <EventForm
-          initialData={editingEvent || undefined}
-          onSubmit={editingEvent ? handleEditEvent : handleCreateEvent}
-          onCancel={() => {
-            setIsModalOpen(false);
-            setEditingEvent(null);
-          }}
-        />
-      </Modal>
+      <EventFormModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={editingEvent ? handleEditEvent : handleCreateEvent}
+        initialData={editingEvent || undefined}
+        mode={editingEvent ? 'edit' : 'create'}
+      />
     </div>
   );
 };

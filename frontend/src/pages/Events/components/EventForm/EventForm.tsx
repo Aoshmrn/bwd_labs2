@@ -1,9 +1,10 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAppDispatch } from '../../../../store/hooks';
-import { createEvent } from '../../../../store/slices/eventsSlice';
+import { createEvent, updateEvent, getEventById } from '../../../../store/slices/eventsSlice';
 import { useNotification } from '../../../../contexts/NotificationContext';
+import { Loading } from '../../../../components/Loading/Loading';
 import styles from './styles.module.scss';
 
 type EventCategory = 'концерт' | 'лекция' | 'выставка';
@@ -16,11 +17,32 @@ interface EventFormData {
 }
 
 const EventForm: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { addNotification } = useNotification();
-  
-  const { register, handleSubmit, formState: { errors } } = useForm<EventFormData>();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<EventFormData>();
+  const isEditing = Boolean(id);
+
+  // Fetch event data if editing
+  useEffect(() => {
+    if (id) {
+      dispatch(getEventById(parseInt(id, 10)))
+        .unwrap()
+        .then((event) => {
+          reset({
+            title: event.title,
+            description: event.description || '',
+            date: new Date(event.date).toISOString().split('T')[0],
+            category: event.category as EventCategory || ''
+          });
+        })
+        .catch((error) => {
+          addNotification('Ошибка при загрузке события', 'error');
+          navigate('/my-events');
+        });
+    }
+  }, [id, dispatch, reset, navigate, addNotification]);
 
   const onSubmit = async (data: EventFormData) => {
     try {
@@ -30,8 +52,19 @@ const EventForm: React.FC = () => {
         category: data.category || undefined,
       };
 
-      await dispatch(createEvent(eventData)).unwrap();
-      addNotification('Событие успешно создано', 'success');
+      if (isEditing && id) {
+        await dispatch(updateEvent({ 
+          id: parseInt(id, 10), 
+          title: eventData.title,
+          description: eventData.description,
+          date: eventData.date,
+          category: eventData.category
+        })).unwrap();
+        addNotification('Событие успешно обновлено', 'success');
+      } else {
+        await dispatch(createEvent(eventData)).unwrap();
+        addNotification('Событие успешно создано', 'success');
+      }
       navigate('/my-events');
     } catch (error) {
       addNotification(
@@ -43,7 +76,7 @@ const EventForm: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <h1>Создание нового события</h1>
+      <h1>{isEditing ? 'Редактирование события' : 'Создание нового события'}</h1>
       <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
         <div className={styles.formGroup}>
           <label htmlFor="title">Название*</label>
@@ -86,7 +119,7 @@ const EventForm: React.FC = () => {
           </select>
         </div>
 
-        <div className={styles.buttons}>
+        <div className={styles.actions}>
           <button 
             type="button" 
             onClick={() => navigate(-1)} 
@@ -98,7 +131,7 @@ const EventForm: React.FC = () => {
             type="submit" 
             className={styles.submitButton}
           >
-            Создать
+            {isEditing ? 'Сохранить' : 'Создать'}
           </button>
         </div>
       </form>
