@@ -16,8 +16,8 @@ export const registerUser = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
+    const { firstName, lastName, middleName, gender, birthDate, email, password } = req.body;
+    if (!firstName || !email || !password) {
       throw new ValidationError(['Все поля обязательны для заполнения']);
     }
     const existingUser = await User.findOne({ where: { email } });
@@ -28,7 +28,11 @@ export const registerUser = async (
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
-      name,
+      firstName,
+      lastName,
+      middleName,
+      gender,
+      birthDate,
       email,
       password: hashedPassword,
       role: userCount === 0 ? 'admin' : 'user',
@@ -44,7 +48,11 @@ export const registerUser = async (
       token,
       user: {
         id: user.id,
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        middleName: user.middleName,
+        gender: user.gender,
+        birthDate: user.birthDate,
         email: user.email,
         role: user.role
       }
@@ -84,7 +92,11 @@ export const loginUser = async (
       token,
       user: {
         id: user.id,
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        middleName: user.middleName,
+        gender: user.gender,
+        birthDate: user.birthDate,
         email: user.email,
         role: user.role
       }

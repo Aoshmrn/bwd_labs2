@@ -32,8 +32,9 @@ export const createUser = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const { name, email, password, role } = req.body;
-    if (!name || !email || !password) {
+    const { firstName, lastName, middleName, email, password, gender, birthDate, role } = req.body;
+    
+    if (!firstName || !lastName || !middleName || !email || !password || !gender || !birthDate) {
       throw new ValidationError([
         'Все обязательные поля должны быть заполнены',
       ]);
@@ -44,15 +45,38 @@ export const createUser = async (
       throw new ValidationError(['Пользователь с таким email уже существует']);
     }
 
+    // Validate birth date
+    const birthDateObj = new Date(birthDate);
+    if (isNaN(birthDateObj.getTime()) || birthDateObj >= new Date()) {
+      throw new ValidationError(['Некорректная дата рождения']);
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
-      name,
+      firstName,
+      lastName,
+      middleName,
       email,
       password: hashedPassword,
+      gender,
+      birthDate: birthDateObj,
       role: role || 'user',
     });
 
-    res.status(201).json(user);
+    // Create a new object without password instead of deleting it
+    const userResponse = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      middleName: user.middleName,
+      email: user.email,
+      gender: user.gender,
+      birthDate: user.birthDate,
+      role: user.role,
+      createdAt: user.createdAt
+    };
+
+    res.status(201).json(userResponse);
   } catch (error) {
     next(error);
   }
@@ -142,7 +166,7 @@ export const getUserProfile = async (
     }
 
     const user = await User.findByPk(userId, {
-      attributes: ['id', 'name', 'email', 'role', 'createdAt'],
+      attributes: ['id', 'firstName', 'lastName', 'middleName', 'email', 'gender', 'birthDate', 'role', 'createdAt'],
     });
 
     if (!user) {
@@ -150,6 +174,56 @@ export const getUserProfile = async (
     }
 
     res.json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateUserProfile = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      throw new CustomError('Не авторизован', 401);
+    }
+
+    const { firstName, lastName, middleName, gender, birthDate } = req.body;
+
+    // Validate required fields
+    if (!firstName || !lastName || !middleName || !gender || !birthDate) {
+      throw new ValidationError(['Все обязательные поля должны быть заполнены']);
+    }
+
+    // Validate birth date
+    const birthDateObj = new Date(birthDate);
+    if (isNaN(birthDateObj.getTime()) || birthDateObj >= new Date()) {
+      throw new ValidationError(['Некорректная дата рождения']);
+    }
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw new NotFoundError('Пользователь');
+    }
+
+    // Update user profile
+    await user.update({
+      firstName,
+      lastName,
+      middleName,
+      gender,
+      birthDate: birthDateObj,
+    });
+
+    // Get updated user data without password
+    const updatedUser = await User.findByPk(userId, {
+      attributes: ['id', 'firstName', 'lastName', 'middleName', 'email', 'gender', 'birthDate', 'role', 'createdAt'],
+    });
+
+    res.json(updatedUser);
   } catch (error) {
     next(error);
   }
@@ -177,7 +251,7 @@ export const getUserEvents = async (
       include: [
         {
           model: User,
-          attributes: ['name'],
+          attributes: ['firstName', 'lastName', 'middleName'],
         },
       ],
       order: [['date', 'DESC']],

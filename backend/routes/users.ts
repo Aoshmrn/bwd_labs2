@@ -7,6 +7,7 @@ import {
   checkRole,
   getUserProfile,
   getUserEvents,
+  updateUserProfile,
 } from '@controllers/user.controller';
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router.use(passport.authenticate('jwt', { session: false }));
 // Public route for authenticated users
 router.get('/', getAllUser);
 router.get('/profile', getUserProfile);
+router.patch('/profile', updateUserProfile);
 router.get('/:userId/events', getUserEvents);
 
 // Admin only routes
@@ -138,6 +140,77 @@ export default router;
 
 /**
  * @swagger
+ * /users/profile:
+ *   get:
+ *     summary: Получить профиль пользователя
+ *     tags: [Пользователи]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Данные профиля пользователя
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Не авторизован
+ *       404:
+ *         description: Пользователь не найден
+ *
+ *   patch:
+ *     summary: Обновить профиль пользователя
+ *     tags: [Пользователи]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - firstName
+ *               - lastName
+ *               - middleName
+ *               - gender
+ *               - birthDate
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 50
+ *               lastName:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 50
+ *               middleName:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 50
+ *               gender:
+ *                 type: string
+ *                 enum: [male, female, other]
+ *               birthDate:
+ *                 type: string
+ *                 format: date
+ *     responses:
+ *       200:
+ *         description: Профиль успешно обновлен
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Ошибка валидации
+ *       401:
+ *         description: Не авторизован
+ *       404:
+ *         description: Пользователь не найден
+ */
+
+/**
+ * @swagger
  * components:
  *   schemas:
  *     User:
@@ -145,21 +218,55 @@ export default router;
  *       properties:
  *         id:
  *           type: integer
- *         name:
+ *         firstName:
+ *           type: string
+ *         lastName:
+ *           type: string
+ *         middleName:
  *           type: string
  *         email:
  *           type: string
+ *         gender:
+ *           type: string
+ *           enum: [male, female, other]
+ *         birthDate:
+ *           type: string
+ *           format: date
+ *         role:
+ *           type: string
+ *           enum: [user, admin]
  *         createdAt:
  *           type: string
  *           format: date-time
  *     UserInput:
  *       type: object
  *       required:
- *         - name
+ *         - firstName
+ *         - lastName
+ *         - middleName
  *         - email
+ *         - gender
+ *         - birthDate
  *       properties:
- *         name:
+ *         firstName:
  *           type: string
+ *           minLength: 2
+ *           maxLength: 50
+ *         lastName:
+ *           type: string
+ *           minLength: 2
+ *           maxLength: 50
+ *         middleName:
+ *           type: string
+ *           minLength: 2
+ *           maxLength: 50
  *         email:
  *           type: string
+ *           format: email
+ *         gender:
+ *           type: string
+ *           enum: [male, female, other]
+ *         birthDate:
+ *           type: string
+ *           format: date
  */

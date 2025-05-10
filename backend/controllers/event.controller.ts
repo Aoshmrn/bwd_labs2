@@ -18,7 +18,7 @@ export const getAllEvents = async (
 
     const events = await Event.findAll({
       where: whereClause,
-      include: [{ model: User, attributes: ['name', 'email'] }],
+      include: [{ model: User, attributes: ['firstName', 'lastName', 'middleName', 'email'] }],
     });
     res.status(200).json(events);
   } catch (error) {

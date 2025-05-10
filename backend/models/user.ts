@@ -3,9 +3,13 @@ import sequelize from '@config/db';
 
 interface UserAttributes {
   id: number;
-  name: string;
+  firstName: string;
+  lastName: string;
+  middleName: string;
   email: string;
   password: string;
+  gender: 'male' | 'female' | 'other';
+  birthDate: Date;
   role: 'user' | 'admin';
   createdAt?: Date;
 }
@@ -18,9 +22,13 @@ class User
   implements UserAttributes
 {
   declare id: number;
-  declare name: string;
+  declare firstName: string;
+  declare lastName: string;
+  declare middleName: string;
   declare email: string;
   declare password: string;
+  declare gender: 'male' | 'female' | 'other';
+  declare birthDate: Date;
   declare role: 'user' | 'admin';
   declare readonly createdAt: Date;
 }
@@ -32,11 +40,28 @@ User.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    name: {
+    firstName: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
+        len: [2, 50],
+      },
+    },
+    lastName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        len: [2, 50],
+      },
+    },
+    middleName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        len: [2, 50],
       },
     },
     email: {
@@ -52,6 +77,21 @@ User.init(
       allowNull: false,
       validate: {
         notEmpty: true,
+      },
+    },
+    gender: {
+      type: DataTypes.ENUM('male', 'female', 'other'),
+      allowNull: false,
+      validate: {
+        isIn: [['male', 'female', 'other']],
+      },
+    },
+    birthDate: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      validate: {
+        isDate: true,
+        isBefore: new Date().toISOString(),
       },
     },
     role: {
