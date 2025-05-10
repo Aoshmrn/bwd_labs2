@@ -1,23 +1,9 @@
 import React, { Suspense } from 'react';
-import { Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { Loading } from '../components/Loading/Loading';
-import { PrivateRoute } from '../components/PrivateRoute/PrivateRoute';
-import { useAuth } from '../contexts/AuthContext';
-
-// Create AdminRoute component for admin-only routes
-const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, isAdmin } = useAuth();
-  
-  if (!user) {
-    return <Navigate to="/login" />;
-  }
-  
-  if (!isAdmin) {
-    return <Navigate to="/" />;
-  }
-  
-  return <>{children}</>;
-};
+import { ProtectedRoute } from '../components/ProtectedRoute/ProtectedRoute';
+import { AdminRoute } from '../components/AdminRoute/AdminRoute';
+import { Layout } from '../components/Layout/Layout';
 
 const Home = React.lazy(() => import('../pages/Home/Home'));
 const Events = React.lazy(() => import('../pages/Events/Events'));
@@ -27,40 +13,31 @@ const Profile = React.lazy(() => import('../pages/Profile/Profile'));
 const MyEvents = React.lazy(() => import('../pages/MyEvents/MyEvents'));
 const Users = React.lazy(() => import('../pages/Users/Users'));
 const NotFound = React.lazy(() => import('../pages/NotFound/NotFound'));
+const EventForm = React.lazy(() => import('../pages/Events/components/EventForm/EventForm'));
 
 const AppRoutes: React.FC = () => {
   return (
     <Suspense fallback={<Loading />}>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/profile"
-          element={
-            <PrivateRoute>
-              <Profile />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/my-events"
-          element={
-            <PrivateRoute>
-              <MyEvents />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/users"
-          element={
-            <AdminRoute>
-              <Users />
-            </AdminRoute>
-          }
-        />
-        <Route path="*" element={<NotFound />} />
+        <Route element={<Layout />}>
+          {/* Публичные маршруты */}
+          <Route path="/" element={<Home />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          {/* Защищенные маршруты */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/my-events" element={<MyEvents />} />
+            <Route path="/users" element={<AdminRoute><Users /></AdminRoute>} />
+            <Route path="/event/new" element={<EventForm />} />
+            <Route path="/event/:id/edit" element={<EventForm />} />
+          </Route>
+
+          {/* 404 fallback */}
+          <Route path="*" element={<NotFound />} />
+        </Route>
       </Routes>
     </Suspense>
   );

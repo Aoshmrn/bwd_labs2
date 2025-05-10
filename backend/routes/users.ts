@@ -5,6 +5,8 @@ import {
   getAllUser,
   updateUserRole,
   checkRole,
+  getUserProfile,
+  getUserEvents,
 } from '@controllers/user.controller';
 
 const router = express.Router();
@@ -14,6 +16,8 @@ router.use(passport.authenticate('jwt', { session: false }));
 
 // Public route for authenticated users
 router.get('/', getAllUser);
+router.get('/profile', getUserProfile);
+router.get('/:userId/events', getUserEvents);
 
 // Admin only routes
 router.use(checkRole); 

@@ -1,16 +1,16 @@
 import React, { createContext, useContext, useState } from 'react';
 import styles from './NotificationContext.module.scss';
 
-type NotificationType = 'success' | 'error' | 'info';
-
 interface Notification {
   id: number;
   message: string;
-  type: NotificationType;
+  type: 'success' | 'error' | 'info';
 }
 
 interface NotificationContextType {
-  showNotification: (message: string, type: NotificationType) => void;
+  notifications: Notification[];
+  addNotification: (message: string, type: 'success' | 'error' | 'info') => void;
+  removeNotification: (id: number) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -18,20 +18,30 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  const showNotification = (message: string, type: NotificationType) => {
+  const addNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     const id = Date.now();
     setNotifications(prev => [...prev, { id, message, type }]);
+
+    // Автоматически удаляем уведомление через 5 секунд
     setTimeout(() => {
-      setNotifications(prev => prev.filter(notification => notification.id !== id));
-    }, 3000);
+      removeNotification(id);
+    }, 5000);
+  };
+
+  const removeNotification = (id: number) => {
+    setNotifications(prev => prev.filter(notification => notification.id !== id));
   };
 
   return (
-    <NotificationContext.Provider value={{ showNotification }}>
+    <NotificationContext.Provider value={{ notifications, addNotification, removeNotification }}>
       {children}
       <div className={styles.notificationContainer}>
         {notifications.map(notification => (
-          <div key={notification.id} className={`${styles.notification} ${styles[notification.type]}`}>
+          <div
+            key={notification.id}
+            className={`${styles.notification} ${styles[notification.type]}`}
+            onClick={() => removeNotification(notification.id)}
+          >
             {notification.message}
           </div>
         ))}
@@ -46,4 +56,4 @@ export const useNotification = () => {
     throw new Error('useNotification must be used within a NotificationProvider');
   }
   return context;
-};
+}; 

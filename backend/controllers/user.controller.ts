@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import User from '@models/user';
+import Event from '@models/event';
 import { NotFoundError, ValidationError, CustomError } from '@/customErrors';
 import { Model, ModelStatic } from 'sequelize';
 
@@ -123,6 +124,66 @@ export const checkOwnership = async (
     }
 
     next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserProfile = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      throw new CustomError('Не авторизован', 401);
+    }
+
+    const user = await User.findByPk(userId, {
+      attributes: ['id', 'name', 'email', 'role', 'createdAt'],
+    });
+
+    if (!user) {
+      throw new NotFoundError('Пользователь');
+    }
+
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserEvents = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { userId } = req.params;
+    
+    if (!req.user) {
+      throw new CustomError('Не авторизован', 401);
+    }
+
+    // Проверяем, что пользователь запрашивает свои события или является админом
+    if (req.user.id !== parseInt(userId) && req.user.role !== 'admin') {
+      throw new CustomError('Недостаточно прав', 403);
+    }
+
+    const events = await Event.findAll({
+      where: { createdBy: userId },
+      include: [
+        {
+          model: User,
+          attributes: ['name'],
+        },
+      ],
+      order: [['date', 'DESC']],
+    });
+
+    res.json(events);
   } catch (error) {
     next(error);
   }

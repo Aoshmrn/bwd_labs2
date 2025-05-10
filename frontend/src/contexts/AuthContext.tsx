@@ -72,6 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: response.user.role
       };
       
+      setToken(response.token);
       setUser(userData);
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
       
@@ -111,7 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{ 
         user, 
         loading, 
-        error,
+        error, 
         isAdmin,
         login, 
         logout,
