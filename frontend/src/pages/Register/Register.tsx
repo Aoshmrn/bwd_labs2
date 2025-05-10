@@ -5,25 +5,33 @@ import { register } from '../../api/authService';
 import styles from './Register.module.scss';
 
 interface RegisterForm {
-  username: string;
+  firstName: string;
+  lastName: string;
+  middleName: string;
   email: string;
   password: string;
   confirmPassword: string;
+  gender: 'male' | 'female' | 'other';
+  birthDate: string;
 }
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState<RegisterForm>({
-    username: '',
+    firstName: '',
+    lastName: '',
+    middleName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    gender: 'male',
+    birthDate: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -40,22 +48,30 @@ const Register: React.FC = () => {
       return;
     }
 
+    // Validate birth date
+    const birthDate = new Date(formData.birthDate);
+    if (isNaN(birthDate.getTime()) || birthDate >= new Date()) {
+      setError('Некорректная дата рождения');
+      return;
+    }
+
     try {
       setLoading(true);
-      // First register the user
       await register({
-        name: formData.username,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        middleName: formData.middleName,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        gender: formData.gender,
+        birthDate: formData.birthDate
       });
       
-      // Then log them in automatically
       await login({
         email: formData.email,
         password: formData.password
       });
       
-      // Redirect to home page after successful registration and login
       navigate('/');
     } catch (err: any) {
       console.error('Registration error:', err);
@@ -74,11 +90,39 @@ const Register: React.FC = () => {
         <div className={styles.formGroup}>
           <input
             type="text"
-            name="username"
-            placeholder="Имя пользователя"
-            value={formData.username}
+            name="lastName"
+            placeholder="Фамилия"
+            value={formData.lastName}
             onChange={handleChange}
             required
+            minLength={2}
+            maxLength={50}
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <input
+            type="text"
+            name="firstName"
+            placeholder="Имя"
+            value={formData.firstName}
+            onChange={handleChange}
+            required
+            minLength={2}
+            maxLength={50}
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <input
+            type="text"
+            name="middleName"
+            placeholder="Отчество"
+            value={formData.middleName}
+            onChange={handleChange}
+            required
+            minLength={2}
+            maxLength={50}
           />
         </div>
 
@@ -90,6 +134,31 @@ const Register: React.FC = () => {
             value={formData.email}
             onChange={handleChange}
             required
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <select
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
+            required
+            className={styles.select}
+          >
+            <option value="male">Мужской</option>
+            <option value="female">Женский</option>
+            <option value="other">Другой</option>
+          </select>
+        </div>
+
+        <div className={styles.formGroup}>
+          <input
+            type="date"
+            name="birthDate"
+            value={formData.birthDate}
+            onChange={handleChange}
+            required
+            max={new Date().toISOString().split('T')[0]}
           />
         </div>
 

@@ -38,7 +38,6 @@ export const getEventById = async (id: number) => {
 
 export const createEvent = async (data: CreateEventData) => {
   try {
-    // Ensure the data has empty strings for optional fields if they're not provided
     const eventData = {
       ...data,
       description: data.description || '',

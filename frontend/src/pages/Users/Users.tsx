@@ -43,7 +43,7 @@ const Users: React.FC = () => {
       
       <div className={styles.usersList}>
         <div className={styles.usersHeader}>
-          <div className={styles.name}>Имя</div>
+          <div className={styles.name}>ФИО</div>
           <div className={styles.email}>Email</div>
           <div className={styles.role}>Роль</div>
         </div>
@@ -51,7 +51,9 @@ const Users: React.FC = () => {
         {users.length > 0 ? (
           users.map(user => (
             <div key={user.id} className={styles.userItem}>
-              <div className={styles.name}>{user.name}</div>
+              <div className={styles.name}>
+                {user.lastName} {user.firstName} {user.middleName}
+              </div>
               <div className={styles.email}>{user.email}</div>
               <div className={styles.role}>
                 <span className={user.role === 'admin' ? styles.adminBadge : styles.userBadge}>
@@ -68,4 +70,4 @@ const Users: React.FC = () => {
   );
 };
 
-export default Users; 
+export default Users;

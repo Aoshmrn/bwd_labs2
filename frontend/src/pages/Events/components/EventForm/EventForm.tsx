@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { useAppDispatch } from '../../../../store/hooks';
 import { createEvent, updateEvent, getEventById } from '../../../../store/slices/eventsSlice';
 import { useNotification } from '../../../../contexts/NotificationContext';
-import { Loading } from '../../../../components/Loading/Loading';
 import styles from './styles.module.scss';
 
 type EventCategory = 'концерт' | 'лекция' | 'выставка';

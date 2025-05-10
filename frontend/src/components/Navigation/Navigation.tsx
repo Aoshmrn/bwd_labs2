@@ -69,12 +69,12 @@ const Navigation: React.FC = () => {
               className={styles.avatar}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {user.username[0].toUpperCase()}
+              {user && user.firstName ? user.firstName[0].toUpperCase() : ''}
             </div>
             {isMenuOpen && (
               <div className={styles.dropdown}>
                 <div className={styles.username}>
-                  {user.username}
+                  {user.firstName}
                   {isAdmin && <span className={styles.adminBadge}>Админ</span>}
                 </div>
                 <Link to="/profile" className={styles.dropdownItem}>

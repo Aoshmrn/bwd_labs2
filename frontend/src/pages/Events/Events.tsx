@@ -9,8 +9,6 @@ const categoryLabels: Record<string, string> = {
   'выставка': 'Выставка'
 };
 
-const allCategories = ['концерт', 'лекция', 'выставка'];
-
 const Events: React.FC = () => {
   const { events, loading, error, fetchEvents } = useEvents();
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,6 +18,10 @@ const Events: React.FC = () => {
   useEffect(() => {
     fetchEvents();
   }, [fetchEvents]);
+
+  const uniqueCategories = Array.from(
+    new Set(events.map(event => event.category).filter(Boolean))
+  );
 
   const filteredEvents = events
     .filter(event => 
@@ -35,12 +37,6 @@ const Events: React.FC = () => {
       }
       return a.title.localeCompare(b.title);
     });
-
-  // Count events per category for displaying in dropdown
-  const eventsByCategory: Record<string, number> = {};
-  allCategories.forEach(category => {
-    eventsByCategory[category] = events.filter(event => event.category === category).length;
-  });
 
   if (loading) {
     return <Loading />;
@@ -65,9 +61,9 @@ const Events: React.FC = () => {
             className={styles.filter}
           >
             <option value="">Все категории</option>
-            {allCategories.map(category => (
+            {uniqueCategories.map(category => (
               <option key={category} value={category}>
-                {categoryLabels[category]} ({eventsByCategory[category] || 0})
+                {categoryLabels[category as keyof typeof categoryLabels] || category}
               </option>
             ))}
           </select>
@@ -92,11 +88,11 @@ const Events: React.FC = () => {
               <h3>{event.title}</h3>
               <p>{event.description}</p>
               <div className={styles.eventMeta}>
-                {event.category && (
+                {event.category ? (
                   <span className={styles.category}>
-                    {categoryLabels[event.category] || event.category}
+                    {categoryLabels[event.category as keyof typeof categoryLabels] || event.category}
                   </span>
-                )}
+                ) : null}
                 <span className={styles.date}>
                   {new Date(event.date).toLocaleDateString('ru-RU')}
                 </span>
@@ -105,8 +101,7 @@ const Events: React.FC = () => {
           ))
         ) : (
           <div className={styles.noEvents}>
-            {categoryFilter ? `События категории "${categoryLabels[categoryFilter]}" не найдены` : 
-             searchTerm ? 'События не найдены' : 'Нет доступных событий'}
+            {searchTerm || categoryFilter ? 'События не найдены' : 'Нет доступных событий'}
           </div>
         )}
       </div>

@@ -7,15 +7,23 @@ interface LoginData {
 }
 
 interface RegisterData extends LoginData {
-  name: string;
+  firstName: string;
+  lastName: string;
+  middleName: string;
+  gender: 'male' | 'female' | 'other';
+  birthDate: string;
 }
 
 interface AuthResponse {
   token: string;
   user: {
     id: number;
-    name: string;
+    firstName: string;
+    lastName: string;
+    middleName: string;
     email: string;
+    gender: 'male' | 'female' | 'other';
+    birthDate: string;
     role: string;
   };
 }
@@ -40,9 +48,13 @@ export const login = async (data: LoginData): Promise<AuthResponse> => {
 
 export const register = async (data: RegisterData): Promise<AuthResponse> => {
   try {
-    if (!data.name) throw new Error('Name is required');
-    if (!data.email) throw new Error('Email is required');
-    if (!data.password) throw new Error('Password is required');
+    if (!data.firstName) throw new Error('Имя обязательно');
+    if (!data.lastName) throw new Error('Фамилия обязательна');
+    if (!data.middleName) throw new Error('Отчество обязательно');
+    if (!data.email) throw new Error('Email обязателен');
+    if (!data.password) throw new Error('Пароль обязателен');
+    if (!data.gender) throw new Error('Пол обязателен');
+    if (!data.birthDate) throw new Error('Дата рождения обязательна');
     
     const response = await baseApi.post<AuthResponse>('/auth/register', data);
     setToken(response.data.token);

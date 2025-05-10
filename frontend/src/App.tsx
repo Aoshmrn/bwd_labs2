@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
+import Navigation from './components/Navigation/Navigation';
 import AppRoutes from './routes';
 import { AuthProvider } from './contexts/AuthContext';
 import { LoadingProvider } from './contexts/LoadingContext';
@@ -14,7 +15,12 @@ const App = () => {
         <Router>
           <AuthProvider>
             <NotificationProvider>
-              <AppRoutes />
+              <div className="app">
+                <Navigation />
+                <main className="main-content">
+                  <AppRoutes />
+                </main>
+              </div>
             </NotificationProvider>
           </AuthProvider>
         </Router>

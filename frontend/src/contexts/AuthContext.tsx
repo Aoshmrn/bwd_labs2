@@ -1,12 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { login as apiLogin, register as apiRegister } from '../api/authService';
 import { getToken, setToken, removeToken } from '../utils/tokenStorage';
+import { UserProfile } from '../api/userService';
 
 interface User {
   id: number;
-  username: string;
+  firstName: string;
+  lastName: string;
+  middleName: string;
   email: string;
-  role?: string;
+  gender: 'male' | 'female' | 'other';
+  birthDate: string;
+  role: string;
 }
 
 interface LoginCredentials {
@@ -22,6 +27,7 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => void;
   clearError: () => void;
+  updateUser: (userData: UserProfile) => void;
 }
 
 const USER_STORAGE_KEY = 'event_app_user';
@@ -67,8 +73,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       const userData: User = {
         id: response.user.id,
-        username: response.user.name,
+        firstName: response.user.firstName,
+        lastName: response.user.lastName,
+        middleName: response.user.middleName,
         email: response.user.email,
+        gender: response.user.gender,
+        birthDate: response.user.birthDate,
         role: response.user.role
       };
       
@@ -79,7 +89,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err: any) {
       console.error('Login error details:', err);
       
-      // Используем переданное сообщение об ошибке напрямую с бэкенда
       if (typeof err === 'string') {
         setError(err);
       } else {
@@ -90,6 +99,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateUser = (userData: UserProfile) => {
+    if (!user) return;
+
+    const updatedUser: User = {
+      ...user,
+      ...userData
+    };
+
+    setUser(updatedUser);
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(updatedUser));
   };
 
   const logout = () => {
@@ -116,7 +137,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAdmin,
         login, 
         logout,
-        clearError 
+        clearError,
+        updateUser
       }}
     >
       {children}
