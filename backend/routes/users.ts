@@ -22,7 +22,7 @@ router.patch('/profile', updateUserProfile);
 router.get('/:userId/events', getUserEvents);
 
 // Admin only routes
-router.use(checkRole); 
+router.use(checkRole);
 router.post('/', createUser);
 router.patch('/:id/role', updateUserRole);
 

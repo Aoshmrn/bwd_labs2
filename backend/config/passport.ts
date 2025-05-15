@@ -6,16 +6,16 @@ import path from 'path';
 
 dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
 
-// Use a default JWT secret if environment variable is not available
-const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
-
 interface JwtPayload {
   id: number;
 }
 
+// Используем fallback значение, если JWT_SECRET не определен
+const secretOrKey = process.env.JWT_SECRET || 'default_jwt_secret_key';
+
 const options = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: JWT_SECRET,
+  secretOrKey,
 };
 
 passport.use(

@@ -18,7 +18,12 @@ export const getAllEvents = async (
 
     const events = await Event.findAll({
       where: whereClause,
-      include: [{ model: User, attributes: ['firstName', 'lastName', 'middleName', 'email'] }],
+      include: [
+        {
+          model: User,
+          attributes: ['firstName', 'lastName', 'middleName', 'email'],
+        },
+      ],
     });
     res.status(200).json(events);
   } catch (error) {
@@ -50,26 +55,24 @@ export const createEvent = async (
 ): Promise<void> => {
   try {
     const { title, description, date, category } = req.body;
-    
+
     const userId = req.user?.id;
-    
+
     if (!title || !date) {
-      throw new ValidationError([
-        'Название и дата события обязательны',
-      ]);
+      throw new ValidationError(['Название и дата события обязательны']);
     }
-    
+
     const eventData: any = {
       title,
       description: description || '',
       date,
       createdBy: userId,
     };
-    
+
     if (category && category.trim() !== '') {
       eventData.category = category;
     }
-    
+
     const event = await Event.create(eventData);
     res.status(201).json(event);
   } catch (error) {
@@ -89,17 +92,17 @@ export const updateEvent = async (
     if (!event) {
       throw new NotFoundError('Событие');
     }
-    
+
     event.title = title;
     event.description = description || '';
     event.date = date;
-    
+
     if (category && category.trim() !== '') {
       event.category = category;
     } else {
       event.category = undefined;
     }
-      
+
     await event.save();
     res.status(200).json(event);
   } catch (error) {

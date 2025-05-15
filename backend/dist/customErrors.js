@@ -1,27 +1,27 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
+Object.defineProperty(exports, '__esModule', { value: true });
 exports.NotFoundError = exports.ValidationError = exports.CustomError = void 0;
 class CustomError extends Error {
-    statusCode;
-    errors;
-    constructor(message, statusCode) {
-        super(message);
-        this.statusCode = statusCode;
-        this.name = this.constructor.name;
-    }
+  statusCode;
+  errors;
+  constructor(message, statusCode) {
+    super(message);
+    this.statusCode = statusCode;
+    this.name = this.constructor.name;
+  }
 }
 exports.CustomError = CustomError;
 class ValidationError extends CustomError {
-    errors;
-    constructor(errors) {
-        super('Ошибка валидации', 400);
-        this.errors = errors;
-    }
+  errors;
+  constructor(errors) {
+    super('Ошибка валидации', 400);
+    this.errors = errors;
+  }
 }
 exports.ValidationError = ValidationError;
 class NotFoundError extends CustomError {
-    constructor(resource = 'Ресурс') {
-        super(`${resource} не найден`, 404);
-    }
+  constructor(resource = 'Ресурс') {
+    super(`${resource} не найден`, 404);
+  }
 }
 exports.NotFoundError = NotFoundError;

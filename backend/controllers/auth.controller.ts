@@ -16,7 +16,15 @@ export const registerUser = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const { firstName, lastName, middleName, gender, birthDate, email, password } = req.body;
+    const {
+      firstName,
+      lastName,
+      middleName,
+      gender,
+      birthDate,
+      email,
+      password,
+    } = req.body;
     if (!firstName || !email || !password) {
       throw new ValidationError(['Все поля обязательны для заполнения']);
     }
@@ -54,8 +62,8 @@ export const registerUser = async (
         gender: user.gender,
         birthDate: user.birthDate,
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+      },
     });
   } catch (error) {
     next(error);
@@ -98,8 +106,8 @@ export const loginUser = async (
         gender: user.gender,
         birthDate: user.birthDate,
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+      },
     });
   } catch (error) {
     next(error);

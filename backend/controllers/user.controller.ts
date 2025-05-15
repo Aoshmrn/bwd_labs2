@@ -3,7 +3,6 @@ import bcrypt from 'bcryptjs';
 import User from '@models/user';
 import Event from '@models/event';
 import { NotFoundError, ValidationError, CustomError } from '@/customErrors';
-import { Model, ModelStatic } from 'sequelize';
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -32,9 +31,26 @@ export const createUser = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const { firstName, lastName, middleName, email, password, gender, birthDate, role } = req.body;
-    
-    if (!firstName || !lastName || !middleName || !email || !password || !gender || !birthDate) {
+    const {
+      firstName,
+      lastName,
+      middleName,
+      email,
+      password,
+      gender,
+      birthDate,
+      role,
+    } = req.body;
+
+    if (
+      !firstName ||
+      !lastName ||
+      !middleName ||
+      !email ||
+      !password ||
+      !gender ||
+      !birthDate
+    ) {
       throw new ValidationError([
         'Все обязательные поля должны быть заполнены',
       ]);
@@ -73,7 +89,7 @@ export const createUser = async (
       gender: user.gender,
       birthDate: user.birthDate,
       role: user.role,
-      createdAt: user.createdAt
+      createdAt: user.createdAt,
     };
 
     res.status(201).json(userResponse);
@@ -160,13 +176,23 @@ export const getUserProfile = async (
 ): Promise<void> => {
   try {
     const userId = req.user?.id;
-    
+
     if (!userId) {
       throw new CustomError('Не авторизован', 401);
     }
 
     const user = await User.findByPk(userId, {
-      attributes: ['id', 'firstName', 'lastName', 'middleName', 'email', 'gender', 'birthDate', 'role', 'createdAt'],
+      attributes: [
+        'id',
+        'firstName',
+        'lastName',
+        'middleName',
+        'email',
+        'gender',
+        'birthDate',
+        'role',
+        'createdAt',
+      ],
     });
 
     if (!user) {
@@ -186,7 +212,7 @@ export const updateUserProfile = async (
 ): Promise<void> => {
   try {
     const userId = req.user?.id;
-    
+
     if (!userId) {
       throw new CustomError('Не авторизован', 401);
     }
@@ -195,7 +221,9 @@ export const updateUserProfile = async (
 
     // Validate required fields
     if (!firstName || !lastName || !middleName || !gender || !birthDate) {
-      throw new ValidationError(['Все обязательные поля должны быть заполнены']);
+      throw new ValidationError([
+        'Все обязательные поля должны быть заполнены',
+      ]);
     }
 
     // Validate birth date
@@ -220,7 +248,17 @@ export const updateUserProfile = async (
 
     // Get updated user data without password
     const updatedUser = await User.findByPk(userId, {
-      attributes: ['id', 'firstName', 'lastName', 'middleName', 'email', 'gender', 'birthDate', 'role', 'createdAt'],
+      attributes: [
+        'id',
+        'firstName',
+        'lastName',
+        'middleName',
+        'email',
+        'gender',
+        'birthDate',
+        'role',
+        'createdAt',
+      ],
     });
 
     res.json(updatedUser);
@@ -236,7 +274,7 @@ export const getUserEvents = async (
 ): Promise<void> => {
   try {
     const { userId } = req.params;
-    
+
     if (!req.user) {
       throw new CustomError('Не авторизован', 401);
     }
